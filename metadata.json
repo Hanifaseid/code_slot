@@ -1,0 +1,6 @@
+{
+  "name": "CodeSlot",
+  "description": "Find remote tech jobs from across the world. 100% remote software engineering, AI, systems, and developer roles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
