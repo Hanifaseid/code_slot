@@ -1,0 +1,22 @@
+// Prisma schema file
+// Configured for PostgreSQL in Full-Stack Monorepo
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Infrastructure placeholder model to verify database connectivity and migration pipeline.
+// Application-specific business models will be defined in future modules.
+model InfrastructureHealth {
+  id        String   @id @default(uuid())
+  status    String   @default("ok")
+  checkedAt DateTime @default(now())
+  details   Json?
+
+  @@map("infrastructure_health")
+}
