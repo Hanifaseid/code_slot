@@ -16,6 +16,8 @@ const envSchema = z.object({
     .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
     .default('info'),
   API_PREFIX: z.string().default('/api'),
+  JWT_SECRET: z.string().default('codeslot_super_secret_jwt_key_2026'),
+  GEMINI_API_KEY: z.string().optional().default(''),
 });
 
 const parsed = envSchema.safeParse(process.env);

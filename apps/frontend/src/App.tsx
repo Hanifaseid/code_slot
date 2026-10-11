@@ -16,7 +16,8 @@ import { ResumeStudio } from './components/resume/ResumeStudio';
 import { AdminPortal } from './components/admin/AdminPortal';
 import { Job, UserSession } from './types';
 import { AITailorResult } from './types/resume';
-import { getJobById, invalidateJobsCache } from './services/jobService';
+import { getJobById, invalidateJobsCache, toggleSaveJobBackend } from './services/jobService';
+import { apiClient, setStoredAuthToken } from './services/apiClient';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<UserSession | null>(() => {
@@ -231,12 +232,17 @@ export default function App() {
   const handleLogout = () => {
     setCurrentUser(null);
     invalidateJobsCache();
+    setStoredAuthToken(null);
     try {
       localStorage.removeItem('codeslot_user');
       localStorage.removeItem('codeslot_admin_auth');
+      localStorage.removeItem('codeslot_auth_token');
     } catch {
       // ignore
     }
+    // Notify backend
+    apiClient.post('/auth/logout').catch(() => {});
+
     setCurrentPage('landing');
     if (window.location.hash) {
       history.replaceState(null, '', window.location.pathname);
@@ -253,6 +259,11 @@ export default function App() {
         // ignore
       }
       return next;
+    });
+
+    // Sync bookmark to backend database
+    toggleSaveJobBackend(jobId).catch((err) => {
+      console.debug('Failed to sync saved job to backend:', err);
     });
   };
 

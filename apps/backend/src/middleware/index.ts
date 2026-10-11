@@ -1,3 +1,4 @@
-export * from './errorHandler.js';
-export * from './requestLogger.js';
-export * from './validateRequest.js';
+export { requestLogger } from './requestLogger.js';
+export { errorHandler } from './errorHandler.js';
+export { validateRequest } from './validateRequest.js';
+export { requireAuth, optionalAuth, requireRole, type AuthenticatedUser } from './auth.js';

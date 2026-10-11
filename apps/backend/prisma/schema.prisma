@@ -10,8 +10,171 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User model for candidates, recruiters, and admins
+model User {
+  id             String           @id @default(uuid())
+  email          String           @unique
+  passwordHash   String
+  name           String
+  title          String?
+  avatar         String?
+  role           String           @default("candidate") // "candidate" | "recruiter" | "admin"
+  status         String           @default("active")    // "active" | "idle" | "suspended" | "verified"
+  plan           String           @default("Free")      // "Free" | "Pro Dev" | "Enterprise"
+  location       String?
+  skills         String[]         @default([])
+  specialization String?
+  githubUrl      String?
+  linkedinUrl    String?
+  portfolioUrl   String?
+  resumeScore    Int              @default(75)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  savedJobs      SavedJob[]
+  applications   JobApplication[]
+  resumes        Resume[]
+  aiSessions     AISession[]
+
+  @@map("users")
+}
+
+// Real remote tech jobs catalog
+model Job {
+  id                        String           @id @default(uuid())
+  title                     String
+  companyName               String           @map("company_name")
+  companyLogo               String?          @map("company_logo")
+  category                  String
+  specialization            String?
+  jobType                   String           @default("Full-time") @map("job_type")
+  candidateRequiredLocation String           @default("Worldwide (Remote)") @map("candidate_required_location")
+  salary                    String?
+  publicationDate           DateTime         @default(now()) @map("publication_date")
+  description               String           @db.Text
+  url                       String
+  tags                      String[]         @default([])
+  source                    String           @default("CodeSlot Direct")
+  companyWebsite            String?          @map("company_website")
+  featured                  Boolean          @default(false)
+  createdAt                 DateTime         @default(now()) @map("created_at")
+  updatedAt                 DateTime         @updatedAt @map("updated_at")
+
+  savedByUsers              SavedJob[]
+  applications              JobApplication[]
+
+  @@map("jobs")
+}
+
+// Saved / Bookmarked jobs
+model SavedJob {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  jobId     String   @map("job_id")
+  savedAt   DateTime @default(now()) @map("saved_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@map("saved_jobs")
+}
+
+// Job applications submitted by candidates
+model JobApplication {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  jobId         String   @map("job_id")
+  stage         String   @default("applied") // "applied" | "screening" | "interview" | "offer" | "rejected" | "archived"
+  matchScore    Int      @default(80) @map("match_score")
+  resumeVersion String   @default("Standard Tailored") @map("resume_version")
+  salaryRange   String?  @map("salary_range")
+  notes         String?  @db.Text
+  appliedAt     DateTime @default(now()) @map("applied_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job           Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@map("job_applications")
+}
+
+// Candidate resume documents
+model Resume {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  title        String   @default("My Tech Resume")
+  templateId   String   @default("ats-compact") @map("template_id")
+  accentColor  String   @default("slate") @map("accent_color")
+  density      String   @default("standard")
+  paperSize    String   @default("a4") @map("paper_size")
+  content      Json     // Contains personalInfo, experience, skills, projects, education, certifications
+  atsScore     Int      @default(75) @map("ats_score")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("resumes")
+}
+
+// AI Resume Studio tailoring sessions
+model AISession {
+  id                     String   @id @default(uuid())
+  userId                 String   @map("user_id")
+  targetJob              String   @map("target_job")
+  company                String
+  initialAtsScore        Int      @map("initial_ats_score")
+  tailoredAtsScore       Int      @map("tailored_ats_score")
+  improvement            Int
+  bulletPointsGenerated  Int      @default(0) @map("bullet_points_generated")
+  keywordsAdded          String[] @default([]) @map("keywords_added")
+  latencyMs              Int      @default(0) @map("latency_ms")
+  tokensUsed             Int      @default(0) @map("tokens_used")
+  createdAt              DateTime @default(now()) @map("created_at")
+
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_sessions")
+}
+
+// Real-time user activity feed for admin monitoring
+model ActivityLog {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  userName   String   @map("user_name")
+  userEmail  String   @map("user_email")
+  userAvatar String?  @map("user_avatar")
+  userRole   String?  @map("user_role")
+  type       String   // e.g. "login", "job_search", "resume_tailor", etc.
+  category   String   // "auth" | "jobs" | "ai_studio" | "account" | "system"
+  action     String
+  details    String
+  ip         String   @default("127.0.0.1")
+  location   String   @default("Unknown")
+  device     String   @default("Desktop")
+  browser    String?
+  severity   String   @default("info") // "success" | "info" | "warning" | "critical"
+  metadata   Json?
+  timestamp  DateTime @default(now())
+
+  @@map("activity_logs")
+}
+
+// Admin administrative audit log
+model AuditLog {
+  id         String   @id @default(uuid())
+  adminEmail String   @map("admin_email")
+  action     String
+  target     String
+  details    String
+  ip         String   @default("127.0.0.1")
+  timestamp  DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
 // Infrastructure placeholder model to verify database connectivity and migration pipeline.
-// Application-specific business models will be defined in future modules.
 model InfrastructureHealth {
   id        String   @id @default(uuid())
   status    String   @default("ok")

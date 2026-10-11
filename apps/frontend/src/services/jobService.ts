@@ -1,5 +1,6 @@
 import { Job } from '../types';
 import { isInvalidLogoUrl } from '../components/CompanyLogo';
+import { apiClient } from './apiClient';
 
 // Curated 100% verified real tech jobs from major remote-first companies
 const CURATED_REAL_TECH_JOBS: Job[] = [
@@ -1333,6 +1334,16 @@ export async function fetchRealJobs(forceRefresh: boolean = false): Promise<Job[
 
   const collected: Job[] = [...CURATED_REAL_TECH_JOBS];
 
+  // Query CodeSlot Backend API first
+  try {
+    const backendRes = await apiClient.get<{ jobs: Job[] }>('/jobs?limit=100');
+    if (backendRes.success && backendRes.data?.jobs && backendRes.data.jobs.length > 0) {
+      backendRes.data.jobs.forEach((job) => collected.push(job));
+    }
+  } catch (backendErr) {
+    console.debug('Backend jobs API offline, continuing with client feeds:', backendErr);
+  }
+
   try {
     // Query multi-source APIs and RSS feeds in parallel
     const [
@@ -1557,9 +1568,56 @@ export async function getJobById(id: string): Promise<Job | undefined> {
     const found = inMemoryCache.find((j) => j.id === id);
     if (found) return found;
   }
+  try {
+    const res = await apiClient.get<Job>(`/jobs/${id}`);
+    if (res.success && res.data) {
+      return res.data;
+    }
+  } catch {
+    // fallback
+  }
   const allJobs = await fetchRealJobs();
   return allJobs.find((j) => j.id === id);
 }
+
+/**
+ * Toggle bookmarking a job on backend database
+ */
+export async function toggleSaveJobBackend(
+  jobId: string
+): Promise<{ isSaved: boolean; savedJobIds: string[] } | null> {
+  try {
+    const res = await apiClient.post<{ isSaved: boolean; savedJobIds: string[] }>(
+      `/jobs/${jobId}/save`
+    );
+    if (res.success && res.data) {
+      return res.data;
+    }
+  } catch (err) {
+    console.debug('Failed to sync saved job to backend:', err);
+  }
+  return null;
+}
+
+/**
+ * Submit job application to backend
+ */
+export async function applyJobBackend(
+  jobId: string,
+  details: { resumeVersion?: string; matchScore?: number; notes?: string } = {}
+): Promise<boolean> {
+  try {
+    const res = await apiClient.post(`/jobs/${jobId}/apply`, {
+      jobId,
+      ...details,
+    });
+    return Boolean(res.success);
+  } catch (err) {
+    console.debug('Failed to submit application to backend:', err);
+    return false;
+  }
+}
+
 
 /**
  * Format relative date (e.g. "2 days ago", "Today")

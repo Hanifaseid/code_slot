@@ -70,9 +70,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [auditLogs, setAuditLogs] = useState<AdminAuditEntry[]>(() => adminService.getAuditLogs());
   const [jobs, setJobs] = useState<Job[]>([]);
 
-  // Load jobs from jobService
+  // Load jobs and sync admin state from backend
   useEffect(() => {
     fetchRealJobs().then((j: Job[]) => setJobs(j));
+    adminService.syncFromBackend().then(() => {
+      setUsers(adminService.getUsers());
+      setActivities(adminService.getActivities());
+      setApplications(adminService.getApplications());
+      setAiSessions(adminService.getAISessions());
+      setAuditLogs(adminService.getAuditLogs());
+      setStats(adminService.getStats());
+    });
   }, []);
 
   // Show temporary toast feedback

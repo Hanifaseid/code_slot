@@ -17,6 +17,12 @@ export const config = {
   logging: {
     level: env.LOG_LEVEL,
   },
+  auth: {
+    jwtSecret: env.JWT_SECRET,
+  },
+  ai: {
+    geminiApiKey: env.GEMINI_API_KEY,
+  },
 } as const;
 
 export { env, type EnvConfig };

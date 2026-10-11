@@ -16,6 +16,8 @@ import {
   initialAuditLogs,
   initialAdminStats
 } from '../data/adminMockData';
+import { apiClient } from './apiClient';
+
 
 const STORAGE_USERS = 'codeslot_admin_users';
 const STORAGE_ACTIVITIES = 'codeslot_admin_activities';
@@ -81,6 +83,11 @@ export const adminService = {
       ip: '127.0.0.1'
     });
 
+    // Sync to backend asynchronously
+    apiClient.patch(`/admin/users/${userId}/status`, { status }).catch((err) => {
+      console.debug('Async status sync to backend deferred:', err);
+    });
+
     return users;
   },
 
@@ -97,6 +104,12 @@ export const adminService = {
     const current = this.getActivities();
     const updated = [newEvent, ...current].slice(0, 150); // keep recent 150
     setStored(STORAGE_ACTIVITIES, updated);
+
+    // Sync to backend asynchronously
+    apiClient.post('/admin/activities', event).catch((err) => {
+      console.debug('Async activity post to backend deferred:', err);
+    });
+
     return newEvent;
   },
 
@@ -118,6 +131,11 @@ export const adminService = {
       ip: '127.0.0.1'
     });
 
+    // Sync to backend asynchronously
+    apiClient.patch(`/admin/applications/${appId}/stage`, { stage }).catch((err) => {
+      console.debug('Async application stage sync to backend deferred:', err);
+    });
+
     return apps;
   },
 
@@ -132,6 +150,35 @@ export const adminService = {
   addAuditEntry(entry: AdminAuditEntry): void {
     const logs = [entry, ...this.getAuditLogs()].slice(0, 100);
     setStored(STORAGE_AUDIT, logs);
+  },
+
+  /**
+   * Synchronize state from backend control plane when online
+   */
+  async syncFromBackend(): Promise<void> {
+    try {
+      const [usersRes, appsRes, actsRes, aiRes] = await Promise.allSettled([
+        apiClient.get<ManagedUser[]>('/admin/users'),
+        apiClient.get<JobApplicationRecord[]>('/admin/applications'),
+        apiClient.get<UserActivityEvent[]>('/admin/activities'),
+        apiClient.get<AIStudioSessionRecord[]>('/admin/ai-sessions'),
+      ]);
+
+      if (usersRes.status === 'fulfilled' && usersRes.value.success && usersRes.value.data) {
+        setStored(STORAGE_USERS, usersRes.value.data);
+      }
+      if (appsRes.status === 'fulfilled' && appsRes.value.success && appsRes.value.data) {
+        setStored(STORAGE_APPLICATIONS, appsRes.value.data);
+      }
+      if (actsRes.status === 'fulfilled' && actsRes.value.success && actsRes.value.data) {
+        setStored(STORAGE_ACTIVITIES, actsRes.value.data);
+      }
+      if (aiRes.status === 'fulfilled' && aiRes.value.success && aiRes.value.data) {
+        setStored(STORAGE_AI_SESSIONS, aiRes.value.data);
+      }
+    } catch (err) {
+      console.debug('Backend sync deferred:', err);
+    }
   },
 
   // Generates a realistic simulated live event for testing and live demonstration

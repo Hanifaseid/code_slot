@@ -13,6 +13,14 @@ extendZodWithOpenApi(z);
 
 export const registry = new OpenAPIRegistry();
 
+// Register Bearer Authentication Security Scheme
+registry.registerComponent('securitySchemes', 'bearerAuth', {
+  type: 'http',
+  scheme: 'bearer',
+  bearerFormat: 'JWT',
+  description: 'Enter your JWT token obtained from /api/auth/login or /api/auth/demo-login',
+});
+
 // Register Health schema
 const HealthDocSchema = registry.register('HealthStatus', HealthStatusSchema);
 
@@ -42,7 +50,7 @@ registry.registerPath({
   },
 });
 
-export function generateOpenApiDocument() {
+export function generateOpenApiDocument(): Record<string, any> {
   const generator = new OpenApiGeneratorV3(registry.definitions);
   return generator.generateDocument({
     openapi: '3.0.0',

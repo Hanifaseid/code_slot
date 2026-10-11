@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { UserSession } from '../types';
 import { invalidateJobsCache } from '../services/jobService';
+import { apiClient, setStoredAuthToken } from '../services/apiClient';
 
 interface AuthPageProps {
   onBackToHome: () => void;
@@ -60,7 +61,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
   const passwordScore = getPasswordStrength(password);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
     setResetNotice(false);
@@ -78,53 +79,70 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       return;
     }
 
-    // Check for demo admin credentials
-    if (email.trim().toLowerCase() === 'admin@gmail.com') {
-      if (password === 'admin1122') {
-        setIsLoading(true);
-        setTimeout(() => {
-          setIsLoading(false);
-          const adminSession: UserSession = {
-            email: 'admin@gmail.com',
-            name: 'Super Admin',
-            title: 'Lead Platform Administrator',
-            role: 'admin',
-            savedJobIds: [],
-            appliedJobIds: []
-          };
-          try {
-            localStorage.setItem('codeslot_user', JSON.stringify(adminSession));
+    setIsLoading(true);
+
+    try {
+      const endpoint = mode === 'signup' ? '/auth/register' : '/auth/login';
+      const payload =
+        mode === 'signup'
+          ? { email: email.trim(), password, name: fullName.trim() }
+          : { email: email.trim(), password };
+
+      const res = await apiClient.post<{ user: UserSession; token: string }>(endpoint, payload);
+
+      if (res.success && res.data?.user) {
+        setIsLoading(false);
+        const userSession = res.data.user;
+        if (res.data.token) {
+          setStoredAuthToken(res.data.token);
+        }
+        try {
+          localStorage.setItem('codeslot_user', JSON.stringify(userSession));
+          if (userSession.role === 'admin' || userSession.email === 'admin@gmail.com') {
             localStorage.setItem('codeslot_admin_auth', 'true');
-          } catch {
-            // ignore
           }
-          invalidateJobsCache();
-          setAuthSuccess('Super Admin');
-          if (onLoginSuccess) {
-            onLoginSuccess(adminSession);
-          }
-        }, 500);
+        } catch {
+          // ignore
+        }
+        invalidateJobsCache();
+        setAuthSuccess(userSession.name);
+        if (onLoginSuccess) {
+          onLoginSuccess(userSession);
+        }
         return;
-      } else {
+      }
+
+      if (!res.success && res.error && !res.error.includes('Failed to fetch') && !res.error.includes('Network')) {
+        setIsLoading(false);
+        setErrorMessage(res.error);
+        return;
+      }
+    } catch {
+      // Backend offline: continue to client fallback
+    }
+
+    // Client fallback if backend is booting or offline
+    setTimeout(() => {
+      setIsLoading(false);
+      const isAdmin = email.trim().toLowerCase() === 'admin@gmail.com';
+      if (isAdmin && password !== 'admin1122') {
         setErrorMessage('Invalid password for demo admin. Please use "admin1122"');
         return;
       }
-    }
 
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-      const name = fullName.trim() || email.split('@')[0] || 'Developer';
+      const name = isAdmin ? 'Super Admin' : fullName.trim() || email.split('@')[0] || 'Developer';
       const userSession: UserSession = {
         email: email.trim() || 'developer@codeslot.dev',
         name,
-        role: 'candidate',
+        role: isAdmin ? 'admin' : 'candidate',
         savedJobIds: [],
-        appliedJobIds: []
+        appliedJobIds: [],
       };
       try {
         localStorage.setItem('codeslot_user', JSON.stringify(userSession));
+        if (isAdmin) {
+          localStorage.setItem('codeslot_admin_auth', 'true');
+        }
       } catch {
         // ignore
       }
@@ -133,10 +151,38 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       if (onLoginSuccess) {
         onLoginSuccess(userSession);
       }
-    }, 600);
+    }, 400);
   };
 
-  const handleQuickDemoLogin = () => {
+  const handleQuickDemoLogin = async () => {
+    setIsLoading(true);
+    try {
+      const res = await apiClient.post<{ user: UserSession; token: string }>('/auth/demo-login', {
+        role: 'candidate',
+      });
+      if (res.success && res.data?.user) {
+        setIsLoading(false);
+        const userSession = res.data.user;
+        if (res.data.token) {
+          setStoredAuthToken(res.data.token);
+        }
+        try {
+          localStorage.setItem('codeslot_user', JSON.stringify(userSession));
+        } catch {
+          // ignore
+        }
+        invalidateJobsCache();
+        if (onLoginSuccess) {
+          onLoginSuccess(userSession);
+        }
+        return;
+      }
+    } catch {
+      // ignore
+    }
+
+    // Fallback
+    setIsLoading(false);
     const demoUser: UserSession = {
       email: 'alex.mercer@codeslot.dev',
       name: 'Alex Mercer',

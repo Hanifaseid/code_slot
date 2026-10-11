@@ -1,4 +1,5 @@
 import { ResumeData, AITailorResult } from '../types/resume';
+import { apiClient } from './apiClient';
 
 /**
  * Safely retrieve the Gemini API key from environment variables.
@@ -120,6 +121,22 @@ export async function tailorResumeWithAI(
   jobDescription: string,
   customApiKey?: string
 ): Promise<AITailorResult> {
+  // 1. Attempt server-side Gemini AI tailoring via backend API
+  try {
+    const backendRes = await apiClient.post<AITailorResult>('/resume/tailor', {
+      currentResume,
+      jobTitle,
+      companyName,
+      jobDescription,
+      customApiKey,
+    });
+    if (backendRes.success && backendRes.data && backendRes.data.tailoredResume) {
+      return backendRes.data;
+    }
+  } catch (err) {
+    console.debug('Backend resume tailoring endpoint offline, falling back to client execution:', err);
+  }
+
   const apiKey = (customApiKey && customApiKey.trim().length > 5)
     ? customApiKey.trim()
     : getGeminiApiKey();
@@ -242,6 +259,19 @@ export async function enhanceBulletWithAI(
   targetRole: string,
   customApiKey?: string
 ): Promise<string> {
+  try {
+    const res = await apiClient.post<{ enhancedBullet: string }>('/resume/enhance-bullet', {
+      originalBullet: bullet,
+      jobTitle: targetRole,
+      customApiKey,
+    });
+    if (res.success && res.data?.enhancedBullet) {
+      return res.data.enhancedBullet;
+    }
+  } catch {
+    // fallback to client execution
+  }
+
   const apiKey = (customApiKey && customApiKey.trim().length > 5)
     ? customApiKey.trim()
     : getGeminiApiKey();
@@ -331,3 +361,25 @@ function fallbackSmartTailor(
     targetCompany: companyName
   };
 }
+
+
+/**
+ * Save tailored resume to backend database
+ */
+export async function saveResumeToBackend(
+  resumeData: ResumeData,
+  title = 'My Tech Resume',
+  atsScore = 90
+): Promise<boolean> {
+  try {
+    const res = await apiClient.post('/resume/save', {
+      title,
+      content: resumeData,
+      atsScore,
+    });
+    return Boolean(res.success);
+  } catch {
+    return false;
+  }
+}
+
