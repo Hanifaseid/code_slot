@@ -143,4 +143,20 @@ adminRouter.get(
   adminController.getAuditLogs
 );
 
+adminRouter.post(
+  '/system/clear-cache',
+  requireAuth,
+  requireRole('admin'),
+  adminController.clearTelemetryCache
+);
+
+// Global Announcement Banner (GET public, POST admin-only)
+adminRouter.get('/broadcast', adminController.getBroadcast);
+adminRouter.post(
+  '/broadcast',
+  requireAuth,
+  requireRole('admin'),
+  adminController.setBroadcast
+);
+
 export default adminRouter;

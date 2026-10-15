@@ -48,6 +48,37 @@ export class ResumeController {
       next(error);
     }
   }
+
+  async getResumeById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) {
+        throw new BadRequestError('User context required');
+      }
+      const { id } = req.params;
+      const resume = await resumeService.getResumeById(userId, id);
+      if (!resume) {
+        throw new BadRequestError('Resume not found');
+      }
+      sendSuccess(res, resume, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteResume(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) {
+        throw new BadRequestError('User context required');
+      }
+      const { id } = req.params;
+      const deleted = await resumeService.deleteResume(userId, id);
+      sendSuccess(res, { deleted, id }, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const resumeController = new ResumeController();

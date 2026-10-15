@@ -4,6 +4,7 @@ import type {
   LoginRequest,
   UserProfile,
   AuthResponse,
+  UpdateProfileRequest,
 } from '@code-slot/shared';
 import { prisma, checkDatabaseConnection } from '../../database/client.js';
 import { hashPassword, verifyPassword, signToken } from '../../utils/security.js';
@@ -381,6 +382,114 @@ export class AuthService {
       }
     }
     return false;
+  }
+
+  /**
+   * Update candidate / recruiter profile
+   */
+  async updateProfile(userId: string, data: UpdateProfileRequest): Promise<UserProfile> {
+    let updatedRecord: InternalUserRecord | undefined;
+
+    for (const [email, user] of inMemoryUsers.entries()) {
+      if (user.id === userId) {
+        if (data.name !== undefined) user.name = data.name.trim();
+        if (data.title !== undefined) user.title = data.title;
+        if (data.avatar !== undefined) user.avatar = data.avatar;
+        if (data.location !== undefined) user.location = data.location;
+        if (data.skills !== undefined) user.skills = data.skills;
+        if (data.specialization !== undefined) user.specialization = data.specialization;
+        if (data.githubUrl !== undefined) user.githubUrl = data.githubUrl;
+        if (data.linkedinUrl !== undefined) user.linkedinUrl = data.linkedinUrl;
+        if (data.portfolioUrl !== undefined) user.portfolioUrl = data.portfolioUrl;
+
+        inMemoryUsers.set(email, user);
+        updatedRecord = user;
+        break;
+      }
+    }
+
+    const { connected } = await checkDatabaseConnection();
+    if (connected) {
+      try {
+        const dbUser = await prisma.user.update({
+          where: { id: userId },
+          data: {
+            name: data.name?.trim(),
+            title: data.title,
+            avatar: data.avatar,
+            location: data.location,
+            skills: data.skills,
+            specialization: data.specialization,
+            githubUrl: data.githubUrl,
+            linkedinUrl: data.linkedinUrl,
+            portfolioUrl: data.portfolioUrl,
+          },
+          include: { savedJobs: true, applications: true },
+        });
+
+        if (dbUser) {
+          return {
+            id: dbUser.id,
+            email: dbUser.email,
+            name: dbUser.name,
+            title: dbUser.title || undefined,
+            avatar: dbUser.avatar || undefined,
+            role: dbUser.role as 'candidate' | 'recruiter' | 'admin',
+            status: dbUser.status as 'active',
+            plan: dbUser.plan as 'Free',
+            location: dbUser.location || undefined,
+            skills: dbUser.skills,
+            specialization: dbUser.specialization || undefined,
+            githubUrl: dbUser.githubUrl || undefined,
+            linkedinUrl: dbUser.linkedinUrl || undefined,
+            portfolioUrl: dbUser.portfolioUrl || undefined,
+            savedJobIds: dbUser.savedJobs.map((s: any) => s.jobId),
+            appliedJobIds: dbUser.applications.map((a: any) => a.jobId),
+            createdAt: dbUser.createdAt.toISOString(),
+          };
+        }
+      } catch (err) {
+        logger.warn({ err }, 'Prisma update failed in updateProfile, returning in-memory state');
+      }
+    }
+
+    if (updatedRecord) {
+      return toUserProfile(updatedRecord);
+    }
+
+    throw new NotFoundError(`User with ID '${userId}' not found`);
+  }
+
+  /**
+   * Record bookmarked job ID on user in-memory record
+   */
+  recordSavedJob(userId: string, jobId: string, isSaved: boolean): void {
+    for (const user of inMemoryUsers.values()) {
+      if (user.id === userId) {
+        if (isSaved) {
+          if (!user.savedJobIds.includes(jobId)) {
+            user.savedJobIds.push(jobId);
+          }
+        } else {
+          user.savedJobIds = user.savedJobIds.filter((id) => id !== jobId);
+        }
+        break;
+      }
+    }
+  }
+
+  /**
+   * Record applied job ID on user in-memory record
+   */
+  recordAppliedJob(userId: string, jobId: string): void {
+    for (const user of inMemoryUsers.values()) {
+      if (user.id === userId) {
+        if (!user.appliedJobIds.includes(jobId)) {
+          user.appliedJobIds.push(jobId);
+        }
+        break;
+      }
+    }
   }
 }
 

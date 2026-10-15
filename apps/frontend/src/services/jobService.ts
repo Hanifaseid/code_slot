@@ -1604,7 +1604,7 @@ export async function toggleSaveJobBackend(
  */
 export async function applyJobBackend(
   jobId: string,
-  details: { resumeVersion?: string; matchScore?: number; notes?: string } = {}
+  details: { resumeVersion?: string; matchScore?: number; notes?: string; salaryRange?: string } = {}
 ): Promise<boolean> {
   try {
     const res = await apiClient.post(`/jobs/${jobId}/apply`, {

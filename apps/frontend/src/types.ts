@@ -42,6 +42,13 @@ export interface UserSession {
   role?: 'admin' | 'candidate' | 'recruiter';
   savedJobIds: string[];
   appliedJobIds: string[];
+  location?: string;
+  skills?: string[];
+  specialization?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  portfolioUrl?: string;
+  plan?: string;
 }
 
 export interface JobFilters {

@@ -97,6 +97,33 @@ export class AdminController {
       next(error);
     }
   }
+
+  async clearTelemetryCache(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await adminService.clearTelemetryCache();
+      sendSuccess(res, result, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getBroadcast(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const broadcast = adminService.getBroadcastAnnouncement();
+      sendSuccess(res, broadcast, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async setBroadcast(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const broadcast = adminService.setBroadcastAnnouncement(req.body);
+      sendSuccess(res, broadcast, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const adminController = new AdminController();

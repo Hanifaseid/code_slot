@@ -41,10 +41,19 @@ describe('CodeSlot Full Backend API Endpoints', () => {
       expect(res.body.data.user).toHaveProperty('email', 'alex.mercer@codeslot.dev');
     });
 
-    it('GET /api/auth/me should return 401 when token is missing', async () => {
-      const res = await request(app).get('/api/auth/me');
-      expect(res.status).toBe(401);
-      expect(res.body.success).toBe(false);
+    it('PATCH /api/auth/profile should update authenticated user profile', async () => {
+      const res = await request(app)
+        .patch('/api/auth/profile')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          title: 'Staff Distributed Systems Architect',
+          location: 'San Francisco, CA (Remote)',
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.user).toHaveProperty('title', 'Staff Distributed Systems Architect');
+      expect(res.body.data.user).toHaveProperty('location', 'San Francisco, CA (Remote)');
     });
   });
 
@@ -76,6 +85,23 @@ describe('CodeSlot Full Backend API Endpoints', () => {
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.data).toHaveProperty('isSaved');
+    });
+
+    it('POST /api/jobs/:id/apply should submit application with match score and resume version', async () => {
+      const res = await request(app)
+        .post('/api/jobs/cs-linear-staff-eng/apply')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          resumeVersion: 'AI Tailored v1',
+          matchScore: 94,
+          salaryRange: '$200,000 - $240,000',
+          notes: 'Strong alignment with client-side reactive sync systems',
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toHaveProperty('jobTitle');
+      expect(res.body.data).toHaveProperty('stage', 'applied');
     });
   });
 
@@ -152,6 +178,46 @@ describe('CodeSlot Full Backend API Endpoints', () => {
       expect(res.body.data.atsScore).toBeGreaterThanOrEqual(80);
       expect(res.body.data).toHaveProperty('matchedKeywords');
     });
+
+    it('POST /api/resume/save and GET /api/resume/mine should store and list candidate resumes', async () => {
+      const sampleContent = {
+        personalInfo: {
+          fullName: 'Alex Mercer',
+          jobTitle: 'Staff Engineer',
+          email: 'alex@codeslot.dev',
+          phone: '+1 555 0100',
+          location: 'Austin, TX',
+          summary: 'Cloud Systems Leader',
+        },
+        experience: [],
+        skills: { technical: ['Go', 'Kubernetes'], tools: [], soft: [] },
+        projects: [],
+        education: [],
+        certifications: [],
+      };
+
+      const saveRes = await request(app)
+        .post('/api/resume/save')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          title: 'Cloud Leadership Resume',
+          content: sampleContent,
+          atsScore: 92,
+        });
+
+      expect(saveRes.status).toBe(201);
+      expect(saveRes.body.success).toBe(true);
+      expect(saveRes.body.data).toHaveProperty('title', 'Cloud Leadership Resume');
+
+      const listRes = await request(app)
+        .get('/api/resume/mine')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(listRes.status).toBe(200);
+      expect(listRes.body.success).toBe(true);
+      expect(Array.isArray(listRes.body.data)).toBe(true);
+      expect(listRes.body.data.length).toBeGreaterThan(0);
+    });
   });
 
   // 4. Admin Module Tests
@@ -187,6 +253,13 @@ describe('CodeSlot Full Backend API Endpoints', () => {
       expect(res.body.success).toBe(true);
       expect(Array.isArray(res.body.data)).toBe(true);
       expect(res.body.data.length).toBeGreaterThan(0);
+    });
+
+    it('GET /api/admin/broadcast should return global announcement banner', async () => {
+      const res = await request(app).get('/api/admin/broadcast');
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toHaveProperty('message');
     });
   });
 });

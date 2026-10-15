@@ -8,6 +8,7 @@ import type {
   AdminAuditEntry,
   UserStatus,
   ApplicationStage,
+  BroadcastAnnouncement,
 } from '@code-slot/shared';
 import { authService } from '../auth/auth.service.js';
 import { jobsService } from '../jobs/jobs.service.js';
@@ -256,6 +257,58 @@ export class AdminService {
    */
   async getAuditLogs(): Promise<AdminAuditEntry[]> {
     return auditEntriesList;
+  }
+
+  /**
+   * Reset / clear telemetry and activity cache
+   */
+  async clearTelemetryCache(): Promise<{ message: string; timestamp: string }> {
+    activityEventsList.length = 0;
+    this.addAuditEntry({
+      id: `aud-${Date.now()}`,
+      adminEmail: 'admin@gmail.com',
+      action: 'CACHE_RESET',
+      target: 'Telemetry Buffer',
+      details: 'Cleared user activity logs and telemetry buffers to baseline',
+      timestamp: new Date().toISOString(),
+      ip: '127.0.0.1',
+    });
+    return {
+      message: 'Telemetry cache reset successfully',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Broadcast announcement management
+   */
+  private currentBroadcast: BroadcastAnnouncement = {
+    message: 'Welcome to CodeSlot 2.0 – Explore verified remote roles & optimize resumes with Gemini 2.5 Flash',
+    active: true,
+    type: 'info',
+    updatedAt: new Date().toISOString(),
+  };
+
+  getBroadcastAnnouncement(): BroadcastAnnouncement {
+    return this.currentBroadcast;
+  }
+
+  setBroadcastAnnouncement(data: Partial<BroadcastAnnouncement>): BroadcastAnnouncement {
+    this.currentBroadcast = {
+      ...this.currentBroadcast,
+      ...data,
+      updatedAt: new Date().toISOString(),
+    };
+    this.addAuditEntry({
+      id: `aud-${Date.now()}`,
+      adminEmail: 'admin@gmail.com',
+      action: 'BROADCAST_UPDATED',
+      target: 'Global Banner',
+      details: `Updated announcement banner: "${this.currentBroadcast.message}"`,
+      timestamp: new Date().toISOString(),
+      ip: '127.0.0.1',
+    });
+    return this.currentBroadcast;
   }
 
   /**

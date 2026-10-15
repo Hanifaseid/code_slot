@@ -317,6 +317,8 @@ export class JobsService {
       }
     }
 
+    authService.recordSavedJob(userId, jobId, isSaved);
+
     return {
       isSaved,
       savedJobIds: Array.from(userSaved),
@@ -340,7 +342,8 @@ export class JobsService {
    * Submit application for a job
    */
   async applyJob(userId: string, data: ApplyJobRequest): Promise<JobApplication> {
-    const job = await this.getJobById(data.jobId);
+    const targetJobId = data.jobId || '';
+    const job = await this.getJobById(targetJobId);
     let userProfile = { name: 'Applicant', email: 'applicant@codeslot.dev', avatar: undefined as string | undefined };
 
     try {
@@ -374,6 +377,7 @@ export class JobsService {
     };
 
     applicationsList.unshift(application);
+    authService.recordAppliedJob(userId, job.id);
 
     const { connected } = await checkDatabaseConnection();
     if (connected) {
@@ -396,6 +400,24 @@ export class JobsService {
     }
 
     return application;
+  }
+
+  /**
+   * Delete / Remove a job posting (Admin operation)
+   */
+  async deleteJob(jobId: string): Promise<boolean> {
+    const existed = jobsMap.delete(jobId);
+
+    const { connected } = await checkDatabaseConnection();
+    if (connected) {
+      try {
+        await prisma.job.delete({ where: { id: jobId } });
+      } catch (err) {
+        logger.warn({ err }, 'Prisma job delete failed or job not found in DB');
+      }
+    }
+
+    return existed;
   }
 
   /**

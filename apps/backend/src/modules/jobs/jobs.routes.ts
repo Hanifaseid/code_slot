@@ -142,4 +142,18 @@ jobsRouter.post(
   jobsController.applyJob
 );
 
+jobsRouter.post(
+  '/apply',
+  requireAuth,
+  validateRequest({ body: ApplyJobRequestSchema }),
+  jobsController.applyJob
+);
+
+jobsRouter.delete(
+  '/:id',
+  requireAuth,
+  validateRequest({ params: SaveJobParamsSchema }),
+  jobsController.deleteJob
+);
+
 export default jobsRouter;

@@ -370,6 +370,63 @@ You MUST respond with a single valid JSON object with the following structure:
   async getUserResumes(userId: string): Promise<StoredResume[]> {
     return userResumesMap.get(userId) || [];
   }
+
+  /**
+   * Retrieve a specific resume by ID
+   */
+  async getResumeById(userId: string, resumeId: string): Promise<StoredResume | null> {
+    const list = userResumesMap.get(userId) || [];
+    const found = list.find((r) => r.id === resumeId);
+    if (found) return found;
+
+    const { connected } = await checkDatabaseConnection();
+    if (connected) {
+      try {
+        const dbRes = await prisma.resume.findFirst({
+          where: { id: resumeId, userId },
+        });
+        if (dbRes) {
+          return {
+            id: dbRes.id,
+            userId: dbRes.userId,
+            title: dbRes.title,
+            templateId: dbRes.templateId,
+            accentColor: dbRes.accentColor,
+            density: dbRes.density,
+            paperSize: dbRes.paperSize,
+            content: dbRes.content as any,
+            atsScore: dbRes.atsScore,
+            updatedAt: dbRes.updatedAt.toISOString(),
+          };
+        }
+      } catch (err) {
+        logger.warn({ err }, 'Prisma query failed in getResumeById');
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Delete a saved resume
+   */
+  async deleteResume(userId: string, resumeId: string): Promise<boolean> {
+    const list = userResumesMap.get(userId) || [];
+    const filtered = list.filter((r) => r.id !== resumeId);
+    userResumesMap.set(userId, filtered);
+
+    const { connected } = await checkDatabaseConnection();
+    if (connected) {
+      try {
+        await prisma.resume.deleteMany({
+          where: { id: resumeId, userId },
+        });
+      } catch (err) {
+        logger.warn({ err }, 'Prisma resume deletion failed');
+      }
+    }
+
+    return true;
+  }
 }
 
 export const resumeService = new ResumeService();

@@ -17,13 +17,16 @@ import {
   clearCustomGeminiApiKey,
   hasGeminiApiKey,
   isUsingEnvGeminiApiKey,
-  getEnvGeminiApiKey
+  getEnvGeminiApiKey,
+  saveResumeToBackend,
 } from '../../services/aiResumeService';
+import { apiClient } from '../../services/apiClient';
 import { ResumeRenderer } from './ResumeRenderer';
 import { JobSelectorModal } from './JobSelectorModal';
 import { PrintGuideModal } from './PrintGuideModal';
 import {
   Sparkles,
+  Cloud,
   Printer,
   ChevronLeft,
   Briefcase,
@@ -160,6 +163,10 @@ export const ResumeStudio: React.FC<ResumeStudioProps> = ({
   });
   const [keySavedToast, setKeySavedToast] = useState(false);
   const [copiedToast, setCopiedToast] = useState(false);
+  const [isSavingToCloud, setIsSavingToCloud] = useState(false);
+  const [cloudSavedToast, setCloudSavedToast] = useState(false);
+  const [cloudResumes, setCloudResumes] = useState<any[]>([]);
+  const [isCloudResumesModalOpen, setIsCloudResumesModalOpen] = useState(false);
 
   // Live preview zoom factor
   const [zoomScale, setZoomScale] = useState<number>(0.95);
@@ -167,6 +174,18 @@ export const ResumeStudio: React.FC<ResumeStudioProps> = ({
   const initialJobHandledRef = useRef<string | null>(
     initialTailorResult ? (initialJob?.id || 'pretailored') : null
   );
+
+  // Load cloud resumes on mount if authenticated
+  useEffect(() => {
+    apiClient
+      .get<any[]>('/resume/mine')
+      .then((res) => {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+          setCloudResumes(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Save changes to localStorage
   useEffect(() => {
@@ -177,6 +196,26 @@ export const ResumeStudio: React.FC<ResumeStudioProps> = ({
       // ignore
     }
   }, [resumeData, settings]);
+
+  const handleSaveToCloud = async () => {
+    setIsSavingToCloud(true);
+    try {
+      const docTitle = `${resumeData.personalInfo.fullName || 'Candidate'} - ${targetJob.title || resumeData.personalInfo.jobTitle || 'Resume'}`;
+      const atsScore = tailorResult?.atsScore || 88;
+      const ok = await saveResumeToBackend(resumeData, docTitle, atsScore);
+      if (ok) {
+        setCloudSavedToast(true);
+        setTimeout(() => setCloudSavedToast(false), 2500);
+        // Refresh cloud list
+        const res = await apiClient.get<any[]>('/resume/mine');
+        if (res.success && Array.isArray(res.data)) {
+          setCloudResumes(res.data);
+        }
+      }
+    } finally {
+      setIsSavingToCloud(false);
+    }
+  };
 
   // Strip HTML utility for jobs
   const stripHtml = (html: string) => {

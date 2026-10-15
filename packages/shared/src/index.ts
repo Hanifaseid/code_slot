@@ -108,6 +108,19 @@ export const UserProfileSchema = z.object({
 });
 export type UserProfile = z.infer<typeof UserProfileSchema>;
 
+export const UpdateProfileRequestSchema = z.object({
+  name: z.string().min(2).optional(),
+  title: z.string().optional(),
+  avatar: z.string().url().optional().or(z.literal('')),
+  location: z.string().optional(),
+  skills: z.array(z.string()).optional(),
+  specialization: z.string().optional(),
+  githubUrl: z.string().url().optional().or(z.literal('')),
+  linkedinUrl: z.string().url().optional().or(z.literal('')),
+  portfolioUrl: z.string().url().optional().or(z.literal('')),
+});
+export type UpdateProfileRequest = z.infer<typeof UpdateProfileRequestSchema>;
+
 export const AuthResponseSchema = z.object({
   user: UserProfileSchema,
   token: z.string(),
@@ -190,7 +203,7 @@ export const ApplicationStageSchema = z.enum([
 export type ApplicationStage = z.infer<typeof ApplicationStageSchema>;
 
 export const ApplyJobRequestSchema = z.object({
-  jobId: z.string(),
+  jobId: z.string().optional(),
   resumeVersion: z.string().optional().default('Current Tailored Resume'),
   matchScore: z.number().optional().default(85),
   notes: z.string().optional(),
@@ -491,3 +504,11 @@ export type AdminStats = {
   totalJobViews: number;
   apiUptime: string;
 };
+
+export const BroadcastAnnouncementSchema = z.object({
+  message: z.string(),
+  active: z.boolean().default(true),
+  type: z.enum(['info', 'warning', 'success']).default('info'),
+  updatedAt: z.string().optional(),
+});
+export type BroadcastAnnouncement = z.infer<typeof BroadcastAnnouncementSchema>;

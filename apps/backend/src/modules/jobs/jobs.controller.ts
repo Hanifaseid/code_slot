@@ -67,7 +67,11 @@ export class JobsController {
       if (!userId) {
         throw new BadRequestError('User context required to apply');
       }
-      const application = await jobsService.applyJob(userId, req.body);
+      const targetJobId = req.params.id || req.body.jobId;
+      const application = await jobsService.applyJob(userId, {
+        ...req.body,
+        jobId: targetJobId,
+      });
       sendSuccess(res, application, 201);
     } catch (error) {
       next(error);
@@ -82,6 +86,16 @@ export class JobsController {
       }
       const applications = await jobsService.getUserApplications(userId);
       sendSuccess(res, applications, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteJob(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const deleted = await jobsService.deleteJob(id);
+      sendSuccess(res, { deleted, id }, 200);
     } catch (error) {
       next(error);
     }

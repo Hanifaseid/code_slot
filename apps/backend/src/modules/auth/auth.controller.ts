@@ -44,6 +44,18 @@ export class AuthController {
     }
   }
 
+  async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user?.userId) {
+        throw new BadRequestError('User authentication context missing');
+      }
+      const updatedUser = await authService.updateProfile(req.user.userId, req.body);
+      sendSuccess(res, { user: updatedUser }, 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async logout(_req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       sendSuccess(res, { message: 'Logged out successfully' }, 200);

@@ -124,4 +124,16 @@ resumeRouter.get(
   resumeController.getUserResumes
 );
 
+resumeRouter.get(
+  '/:id',
+  requireAuth,
+  resumeController.getResumeById
+);
+
+resumeRouter.delete(
+  '/:id',
+  requireAuth,
+  resumeController.deleteResume
+);
+
 export default resumeRouter;

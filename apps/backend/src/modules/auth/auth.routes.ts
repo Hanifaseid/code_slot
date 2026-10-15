@@ -4,6 +4,7 @@ import {
   RegisterRequestSchema,
   LoginRequestSchema,
   DemoLoginRequestSchema,
+  UpdateProfileRequestSchema,
 } from './auth.schema.js';
 import { validateRequest, requireAuth } from '../../middleware/index.js';
 import { registry } from '../../docs/swagger.js';
@@ -113,6 +114,13 @@ authRouter.get(
   '/me',
   requireAuth,
   authController.getMe
+);
+
+authRouter.patch(
+  '/profile',
+  requireAuth,
+  validateRequest({ body: UpdateProfileRequestSchema }),
+  authController.updateProfile
 );
 
 authRouter.post(

@@ -12,6 +12,7 @@ interface NavbarProps {
   onJobsClick?: () => void;
   onLogout?: () => void;
   onAiResumeClick?: () => void;
+  onProfileClick?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -23,7 +24,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentUser,
   onJobsClick,
   onLogout,
-  onAiResumeClick
+  onAiResumeClick,
+  onProfileClick,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -90,12 +92,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                   About us
                 </button>
                 <div className="flex items-center gap-2 pl-2">
-                  <div className="w-7 h-7 rounded-full bg-neutral-900 text-white font-bold text-[11px] flex items-center justify-center">
-                    {currentUser.name.substring(0, 2).toUpperCase()}
-                  </div>
-                  <span className="text-neutral-800 text-xs font-semibold max-w-[100px] truncate">
-                    {currentUser.name}
-                  </span>
+                  <button
+                    onClick={onProfileClick}
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer group"
+                    title="Edit profile & preferences"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-neutral-900 text-white font-bold text-[11px] flex items-center justify-center group-hover:scale-105 transition-transform">
+                      {currentUser.name.substring(0, 2).toUpperCase()}
+                    </div>
+                    <span className="text-neutral-800 text-xs font-semibold max-w-[100px] truncate underline-offset-2 group-hover:underline">
+                      {currentUser.name}
+                    </span>
+                  </button>
                   <button
                     onClick={onLogout}
                     title="Sign out"

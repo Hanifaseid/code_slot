@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Job } from '../types';
-import { formatRelativeDate, cleanAndFormatDescription } from '../services/jobService';
+import { formatRelativeDate, cleanAndFormatDescription, applyJobBackend } from '../services/jobService';
 import { CompanyLogo } from './CompanyLogo';
 import { AITailorResult, ResumeData } from '../types/resume';
 import { tailorResumeWithAI } from '../services/aiResumeService';
@@ -22,26 +22,65 @@ import {
   Radio,
   Layers,
   Sparkles,
-  Rocket
+  Rocket,
+  Send,
+  Loader2,
+  X,
 } from 'lucide-react';
 
 interface JobDetailPageProps {
   job: Job;
   isSaved?: boolean;
+  isApplied?: boolean;
   onToggleSave?: (jobId: string) => void;
   onBack: () => void;
   onTailorResume?: (job: Job, tailorResult?: AITailorResult) => void;
+  onApplySuccess?: (jobId: string) => void;
 }
 
 export const JobDetailPage: React.FC<JobDetailPageProps> = ({
   job,
   isSaved = false,
+  isApplied = false,
   onToggleSave,
   onBack,
-  onTailorResume
+  onTailorResume,
+  onApplySuccess,
 }) => {
   const [copied, setCopied] = useState(false);
   const [isTailoring, setIsTailoring] = useState(false);
+  const [appliedStatus, setAppliedStatus] = useState(isApplied);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [resumeVersion, setResumeVersion] = useState('AI Tailored Resume');
+  const [matchScore, setMatchScore] = useState(92);
+  const [targetSalary, setTargetSalary] = useState(job.salary || '');
+  const [notes, setNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [applySuccessNotice, setApplySuccessNotice] = useState(false);
+
+  const handleSubmitApplication = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const ok = await applyJobBackend(job.id, {
+        resumeVersion,
+        matchScore,
+        salaryRange: targetSalary,
+        notes,
+      });
+      if (ok) {
+        setAppliedStatus(true);
+        setApplySuccessNotice(true);
+        onApplySuccess?.(job.id);
+        setTimeout(() => {
+          setIsApplyModalOpen(false);
+          setApplySuccessNotice(false);
+        }, 1500);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleTailorResume = async () => {
     if (isTailoring) return;
@@ -270,6 +309,22 @@ export const JobDetailPage: React.FC<JobDetailPageProps> = ({
     <ExternalLink className="w-3.5 h-3.5" />
   </a>
 
+  {appliedStatus ? (
+    <div className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold tracking-tight">
+      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+      <span>Application Tracked in CodeSlot</span>
+    </div>
+  ) : (
+    <button
+      id="track-job-app-btn"
+      onClick={() => setIsApplyModalOpen(true)}
+      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white border border-neutral-300 hover:bg-neutral-50 text-neutral-800 text-xs font-bold tracking-tight shadow-2xs hover:shadow transition-all cursor-pointer"
+    >
+      <Send className="w-3.5 h-3.5 text-neutral-600" />
+      <span>Track Application in CodeSlot</span>
+    </button>
+  )}
+
   <p className="text-[11px] text-neutral-500 text-center flex items-center justify-center gap-1.5">
     <ShieldCheck className="w-4 h-4 text-emerald-600" />
     <span>Verified live position on {job.source}</span>
@@ -411,6 +466,113 @@ export const JobDetailPage: React.FC<JobDetailPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Application Tracking Modal */}
+      {isApplyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#fbfaf7] w-full max-w-lg rounded-3xl border border-neutral-200 shadow-2xl overflow-hidden text-left">
+            <div className="px-6 py-5 bg-white border-b border-neutral-200 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-extrabold text-neutral-900 flex items-center gap-2">
+                  <Send className="w-4 h-4 text-emerald-600" />
+                  <span>Log Job Application in CodeSlot</span>
+                </h3>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Track {job.title} at {job.company_name} in your career tracker
+                </p>
+              </div>
+              <button
+                onClick={() => setIsApplyModalOpen(false)}
+                className="p-1.5 rounded-xl text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitApplication} className="p-6 space-y-4">
+              {applySuccessNotice && (
+                <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Application tracked successfully! Updating dashboard...</span>
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-neutral-700 uppercase tracking-wider">
+                  Resume Version Used
+                </label>
+                <input
+                  type="text"
+                  value={resumeVersion}
+                  onChange={(e) => setResumeVersion(e.target.value)}
+                  placeholder="e.g. AI Tailored Resume v1"
+                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-900 text-xs font-medium focus:outline-none focus:border-neutral-900"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-neutral-700 uppercase tracking-wider">
+                    Target ATS Match %
+                  </label>
+                  <input
+                    type="number"
+                    min="50"
+                    max="100"
+                    value={matchScore}
+                    onChange={(e) => setMatchScore(Number(e.target.value))}
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-900 text-xs font-medium focus:outline-none focus:border-neutral-900"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-neutral-700 uppercase tracking-wider">
+                    Target Compensation
+                  </label>
+                  <input
+                    type="text"
+                    value={targetSalary}
+                    placeholder="e.g. $180k - $220k"
+                    onChange={(e) => setTargetSalary(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-900 text-xs font-medium focus:outline-none focus:border-neutral-900"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-neutral-700 uppercase tracking-wider">
+                  Notes & Outreach Strategy
+                </label>
+                <textarea
+                  rows={3}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="e.g. Submitted via company portal; reached out to hiring manager on LinkedIn..."
+                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-900 text-xs font-medium focus:outline-none focus:border-neutral-900 resize-none"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-neutral-200/80 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsApplyModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-neutral-600 hover:text-neutral-900 font-semibold text-xs transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{isSubmitting ? 'Saving...' : 'Confirm & Track Application'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
