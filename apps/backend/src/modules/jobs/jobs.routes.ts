@@ -119,6 +119,21 @@ jobsRouter.get('/saved', requireAuth, jobsController.getSavedJobs);
 
 jobsRouter.get('/applications', requireAuth, jobsController.getUserApplications);
 
+jobsRouter.get('/external/workingnomads', async (_req, res) => {
+  try {
+    const response = await fetch('https://www.workingnomads.com/api/exposed_jobs/', {
+      headers: { Accept: 'application/json' },
+    });
+    if (!response.ok) {
+      return res.json({ success: true, data: [] });
+    }
+    const data = await response.json();
+    return res.json({ success: true, data });
+  } catch {
+    return res.json({ success: true, data: [] });
+  }
+});
+
 jobsRouter.get('/:id', jobsController.getJobById);
 
 jobsRouter.post(

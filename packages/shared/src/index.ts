@@ -208,6 +208,12 @@ export const ApplyJobRequestSchema = z.object({
   matchScore: z.number().optional().default(85),
   notes: z.string().optional(),
   salaryRange: z.string().optional(),
+  jobTitle: z.string().optional(),
+  company: z.string().optional(),
+  companyLogo: z.string().optional(),
+  sourceUrl: z.string().optional(),
+  category: z.string().optional(),
+  candidateRequiredLocation: z.string().optional(),
 });
 export type ApplyJobRequest = z.infer<typeof ApplyJobRequestSchema>;
 

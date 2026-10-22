@@ -67,6 +67,12 @@ export const JobDetailPage: React.FC<JobDetailPageProps> = ({
         matchScore,
         salaryRange: targetSalary,
         notes,
+        jobTitle: job.title,
+        company: job.company_name,
+        companyLogo: job.company_logo,
+        sourceUrl: job.url,
+        category: job.category,
+        candidateRequiredLocation: job.candidate_required_location,
       });
       if (ok) {
         setAppliedStatus(true);

@@ -112,6 +112,59 @@ interface GeminiApiResponse {
 }
 
 /**
+ * Executes a Gemini generateContent request with multi-model fallback and standard Google authentication headers.
+ */
+async function requestGemini(apiKey: string, body: unknown): Promise<GeminiApiResponse> {
+  const cleanKey = apiKey.trim().replace(/^["']|["']$/g, '');
+  const candidateModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+  let lastError: Error | null = null;
+
+  for (const model of candidateModels) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(cleanKey)}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      let res: Response;
+      try {
+        res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': cleanKey,
+          },
+          signal: controller.signal,
+          body: JSON.stringify(body),
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
+      if (res.ok) {
+        return (await res.json()) as GeminiApiResponse;
+      }
+
+      const errJson = (await res.json().catch(() => ({}))) as { error?: { message?: string; status?: string } };
+      const errMsg = errJson?.error?.message || `Gemini API returned status ${res.status}`;
+      lastError = new Error(errMsg);
+
+      // If model not found (404), fall through to next candidate model
+      if (res.status === 404 || errMsg.toLowerCase().includes('not found')) {
+        continue;
+      }
+
+      throw lastError;
+    } catch (e: unknown) {
+      lastError = e instanceof Error ? e : new Error(String(e));
+      if (lastError.message && !lastError.message.toLowerCase().includes('not found') && !lastError.message.includes('404')) {
+        throw lastError;
+      }
+    }
+  }
+
+  throw lastError || new Error('All Gemini candidate models failed');
+}
+
+/**
  * Tailor an entire resume using Google Gemini 2.5 Flash
  */
 export async function tailorResumeWithAI(
@@ -190,35 +243,15 @@ You MUST respond with a single valid JSON object with the following structure:
   ]
 }
 `;
-
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+    const data = await requestGemini(apiKey, {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.25,
+        topP: 0.95,
       },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [{ text: prompt }]
-          }
-        ],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.25,
-          topP: 0.95
-        }
-      })
     });
-
-    if (!res.ok) {
-      const errJson = await res.json().catch(() => ({}));
-      throw new Error(errJson.error?.message || `Gemini API returned status ${res.status}`);
-    }
-
-    const data: GeminiApiResponse = await res.json();
     const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!rawText) {
@@ -288,21 +321,12 @@ Original bullet point: "${bullet}"
 `;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.3 }
-      })
+    const data = await requestGemini(apiKey, {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.3 }
     });
-
-    if (res.ok) {
-      const data: GeminiApiResponse = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      if (text) return text.replace(/^[-•*]\s*/, '').replace(/^"|"$/g, '');
-    }
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    if (text) return text.replace(/^[-•*]\s*/, '').replace(/^"|"$/g, '');
   } catch (e) {
     console.error('Enhance bullet error:', e);
   }

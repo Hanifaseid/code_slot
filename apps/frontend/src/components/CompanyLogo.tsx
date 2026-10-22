@@ -21,6 +21,7 @@ export function isInvalidLogoUrl(url?: string): boolean {
     lower.includes('stock-photo') ||
     lower.includes('dummyimage') ||
     lower.includes('gravatar.com/avatar/0000000') ||
+    lower.includes('clearbit.com') ||
     lower.includes('default_avatar') ||
     lower.includes('avatar_default')
   );
@@ -151,7 +152,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   className,
   size = 'md'
 }) => {
-  const [logoStage, setLogoStage] = useState<'primary' | 'clearbit' | 'favicon' | 'monogram'>('primary');
+  const [logoStage, setLogoStage] = useState<'primary' | 'favicon' | 'monogram'>('primary');
   const [currentSrc, setCurrentSrc] = useState<string | null>(null);
 
   const domain = getCompanyDomainForJob(job);
@@ -163,8 +164,8 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
       setLogoStage('primary');
       setCurrentSrc(rawLogo);
     } else if (domain) {
-      setLogoStage('clearbit');
-      setCurrentSrc(`https://logo.clearbit.com/${domain}`);
+      setLogoStage('favicon');
+      setCurrentSrc(`https://www.google.com/s2/favicons?domain=${domain}&sz=128`);
     } else {
       setLogoStage('monogram');
       setCurrentSrc(null);
@@ -173,14 +174,6 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
 
   const handleError = () => {
     if (logoStage === 'primary') {
-      if (domain) {
-        setLogoStage('clearbit');
-        setCurrentSrc(`https://logo.clearbit.com/${domain}`);
-      } else {
-        setLogoStage('monogram');
-        setCurrentSrc(null);
-      }
-    } else if (logoStage === 'clearbit') {
       if (domain) {
         setLogoStage('favicon');
         setCurrentSrc(`https://www.google.com/s2/favicons?domain=${domain}&sz=128`);

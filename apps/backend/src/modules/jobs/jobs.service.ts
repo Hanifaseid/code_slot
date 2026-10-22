@@ -34,7 +34,7 @@ const applicationsList: JobApplication[] = [
     jobId: 'cs-automattic-fullstack-core',
     jobTitle: 'Senior Full Stack Engineer - Gutenberg & Web Core',
     company: 'Automattic',
-    companyLogo: 'https://logo.clearbit.com/automattic.com',
+    companyLogo: 'https://www.google.com/s2/favicons?domain=automattic.com&sz=128',
     stage: 'interview',
     appliedAt: '2026-09-21T14:20:00Z',
     matchScore: 94,
@@ -342,8 +342,31 @@ export class JobsService {
    * Submit application for a job
    */
   async applyJob(userId: string, data: ApplyJobRequest): Promise<JobApplication> {
-    const targetJobId = data.jobId || '';
-    const job = await this.getJobById(targetJobId);
+    const targetJobId = data.jobId || `job-ext-${crypto.randomUUID().slice(0, 8)}`;
+    let job: Job;
+    try {
+      job = await this.getJobById(targetJobId);
+    } catch {
+      // External job fetched client-side (e.g. Arbeitnow, Remotive, WWR, YC HN)
+      job = {
+        id: targetJobId,
+        title: data.jobTitle || 'Software Engineer',
+        company_name: data.company || 'Tech Company',
+        company_logo: data.companyLogo,
+        category: data.category || 'Engineering',
+        specialization: data.category || 'Engineering',
+        job_type: 'Full-time',
+        candidate_required_location: data.candidateRequiredLocation || 'Worldwide (Remote)',
+        salary: data.salaryRange || '$140,000 - $190,000',
+        publication_date: new Date().toISOString(),
+        description: data.notes || '<p>Applied via CodeSlot platform.</p>',
+        url: data.sourceUrl || 'https://codeslot.dev',
+        tags: ['Applied'],
+        source: 'Live External Feed',
+        featured: false,
+      };
+      jobsMap.set(targetJobId, job);
+    }
     let userProfile = { name: 'Applicant', email: 'applicant@codeslot.dev', avatar: undefined as string | undefined };
 
     try {

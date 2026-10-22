@@ -4,10 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
+  const envLocal = loadEnv(mode, process.cwd(), '');
+  const envRoot = loadEnv(mode, fileURLToPath(new URL('../..', import.meta.url)), '');
   const geminiKey =
-    env.GEMINI_API_KEY ||
-    env.VITE_GEMINI_API_KEY ||
+    envLocal.GEMINI_API_KEY ||
+    envLocal.VITE_GEMINI_API_KEY ||
+    envRoot.GEMINI_API_KEY ||
+    envRoot.VITE_GEMINI_API_KEY ||
     process.env.GEMINI_API_KEY ||
     process.env.VITE_GEMINI_API_KEY ||
     '';

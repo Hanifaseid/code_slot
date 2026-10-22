@@ -579,9 +579,9 @@ export const JobsPortal: React.FC<JobsPortalProps> = ({
             {/* View Mode: Responsive 4-Column Wide Cards Grid vs Wide List */}
             {filters.viewMode === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-5">
-                {paginatedJobs.map((job) => (
+                {paginatedJobs.map((job, idx) => (
                   <JobCard
-                    key={job.id}
+                    key={`${job.id}-${idx}`}
                     job={job}
                     isSaved={savedJobIds.includes(job.id)}
                     onToggleSave={handleToggleSave}
@@ -591,9 +591,9 @@ export const JobsPortal: React.FC<JobsPortalProps> = ({
               </div>
             ) : (
               <div className="space-y-3.5">
-                {paginatedJobs.map((job) => (
+                {paginatedJobs.map((job, idx) => (
                   <JobListItem
-                    key={job.id}
+                    key={`${job.id}-${idx}`}
                     job={job}
                     isSaved={savedJobIds.includes(job.id)}
                     onToggleSave={handleToggleSave}

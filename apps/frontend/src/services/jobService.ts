@@ -8,7 +8,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-linear-staff-eng',
     title: 'Staff Frontend Engineer - Desktop & Web Core',
     company_name: 'Linear',
-    company_logo: 'https://logo.clearbit.com/linear.app',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Frontend',
     specialization: 'Frontend',
     job_type: 'Full-time',
@@ -41,7 +41,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-stripe-backend-infra',
     title: 'Senior Backend Systems Engineer - Payment Rails & Core Ledger',
     company_name: 'Stripe',
-    company_logo: 'https://logo.clearbit.com/stripe.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Backend',
     specialization: 'Backend',
     job_type: 'Full-time',
@@ -73,7 +73,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-automattic-fullstack-core',
     title: 'Senior Full Stack Engineer - Gutenberg & Web Core',
     company_name: 'Automattic',
-    company_logo: 'https://logo.clearbit.com/automattic.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Full Stack',
     specialization: 'Full Stack',
     job_type: 'Full-time',
@@ -103,7 +103,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-vercel-nextjs-infra',
     title: 'Senior Cloud Edge & Runtime Engineer',
     company_name: 'Vercel',
-    company_logo: 'https://logo.clearbit.com/vercel.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'DevOps / Cloud',
     specialization: 'DevOps / Cloud',
     job_type: 'Full-time',
@@ -134,7 +134,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-supabase-db-kernel',
     title: 'Senior Backend PostgreSQL Kernel Engineer',
     company_name: 'Supabase',
-    company_logo: 'https://logo.clearbit.com/supabase.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Backend',
     specialization: 'Backend',
     job_type: 'Full-time',
@@ -165,7 +165,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-openai-agent-eng',
     title: 'Research Engineer - Applied AI Agents & Tool Use',
     company_name: 'OpenAI',
-    company_logo: 'https://logo.clearbit.com/openai.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'AI & Machine Learning',
     specialization: 'AI & Machine Learning',
     job_type: 'Full-time',
@@ -196,7 +196,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-figma-webgl-frontend',
     title: 'Staff Frontend & Canvas Graphics Engineer',
     company_name: 'Figma',
-    company_logo: 'https://logo.clearbit.com/figma.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Frontend',
     specialization: 'Frontend',
     job_type: 'Full-time',
@@ -227,7 +227,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-github-security-lead',
     title: 'Staff Security Engineer - Supply Chain & Dependabot',
     company_name: 'GitHub',
-    company_logo: 'https://logo.clearbit.com/github.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Security & QA',
     specialization: 'Security & QA',
     job_type: 'Full-time',
@@ -252,7 +252,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-datadog-sre',
     title: 'Principal Site Reliability & Cloud Infrastructure Engineer',
     company_name: 'Datadog',
-    company_logo: 'https://logo.clearbit.com/datadoghq.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'DevOps / Cloud',
     specialization: 'DevOps / Cloud',
     job_type: 'Full-time',
@@ -271,7 +271,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-gitlab-fullstack-dev',
     title: 'Senior Full Stack Engineer - CI/CD & Developer Experience',
     company_name: 'GitLab',
-    company_logo: 'https://logo.clearbit.com/gitlab.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Full Stack',
     specialization: 'Full Stack',
     job_type: 'Full-time',
@@ -290,7 +290,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-ramp-backend-lead',
     title: 'Lead Backend Engineer - Card Authorization & Ledger',
     company_name: 'Ramp',
-    company_logo: 'https://logo.clearbit.com/ramp.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Backend',
     specialization: 'Backend',
     job_type: 'Full-time',
@@ -309,7 +309,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-docker-container-dev',
     title: 'Senior Systems & Cloud Infrastructure Engineer',
     company_name: 'Docker',
-    company_logo: 'https://logo.clearbit.com/docker.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'DevOps / Cloud',
     specialization: 'DevOps / Cloud',
     job_type: 'Full-time',
@@ -328,7 +328,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-posthog-product-eng',
     title: 'Senior Full Stack Product Engineer (YC W20)',
     company_name: 'PostHog',
-    company_logo: 'https://logo.clearbit.com/posthog.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Full Stack',
     specialization: 'Full Stack',
     job_type: 'Full-time',
@@ -353,7 +353,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-resend-infra-staff',
     title: 'Staff Email Infrastructure & Distributed Systems Engineer (YC W23)',
     company_name: 'Resend',
-    company_logo: 'https://logo.clearbit.com/resend.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Backend',
     specialization: 'Backend',
     job_type: 'Full-time',
@@ -378,7 +378,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-modal-gpu-cluster-systems',
     title: 'Senior Distributed Systems & GPU Cloud Infrastructure Engineer',
     company_name: 'Modal Labs',
-    company_logo: 'https://logo.clearbit.com/modal.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'DevOps / Cloud',
     specialization: 'DevOps / Cloud',
     job_type: 'Full-time',
@@ -403,7 +403,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-cursor-ai-systems',
     title: 'Core AI Systems & Code Synthesis Engineer',
     company_name: 'Cursor (Anysphere)',
-    company_logo: 'https://logo.clearbit.com/cursor.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'AI & Machine Learning',
     specialization: 'AI & Machine Learning',
     job_type: 'Full-time',
@@ -428,7 +428,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-perplexity-backend-search',
     title: 'Senior Backend Search & Inference Infrastructure Engineer',
     company_name: 'Perplexity AI',
-    company_logo: 'https://logo.clearbit.com/perplexity.ai',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Backend',
     specialization: 'Backend',
     job_type: 'Full-time',
@@ -453,7 +453,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-retool-frontend-canvas',
     title: 'Senior Frontend & Reactive Systems Engineer (YC W17)',
     company_name: 'Retool',
-    company_logo: 'https://logo.clearbit.com/retool.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Frontend',
     specialization: 'Frontend',
     job_type: 'Full-time',
@@ -478,7 +478,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-brex-fintech-ledger',
     title: 'Lead Financial Infrastructure & Authorization Engineer (YC W17)',
     company_name: 'Brex',
-    company_logo: 'https://logo.clearbit.com/brex.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Backend',
     specialization: 'Backend',
     job_type: 'Full-time',
@@ -503,7 +503,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-railway-cloud-platform',
     title: 'Senior Cloud Platform & Infrastructure Engineer',
     company_name: 'Railway',
-    company_logo: 'https://logo.clearbit.com/railway.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'DevOps / Cloud',
     specialization: 'DevOps / Cloud',
     job_type: 'Full-time',
@@ -528,7 +528,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-langchain-ai-frameworks',
     title: 'Senior AI Applications & Agent Frameworks Engineer',
     company_name: 'LangChain',
-    company_logo: 'https://logo.clearbit.com/langchain.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'AI & Machine Learning',
     specialization: 'AI & Machine Learning',
     job_type: 'Full-time',
@@ -553,7 +553,7 @@ const CURATED_REAL_TECH_JOBS: Job[] = [
     id: 'cs-deel-payroll-fullstack',
     title: 'Senior Full Stack Global Payments Engineer (YC S19)',
     company_name: 'Deel',
-    company_logo: 'https://logo.clearbit.com/deel.com',
+    company_logo: 'https://www.google.com/s2/favicons?domain=&sz=128',
     category: 'Full Stack',
     specialization: 'Full Stack',
     job_type: 'Full-time',
@@ -987,11 +987,10 @@ async function fetchWeWorkRemotelyJobs(timestamp?: number): Promise<Job[]> {
   ];
 
   const jobs: Job[] = [];
-  const cacheBust = timestamp ? `&_cb=${timestamp}` : '';
 
   for (const feed of feeds) {
     try {
-      const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}${cacheBust}`, {
+      const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`, {
         cache: timestamp ? 'no-store' : 'default'
       });
       if (!res.ok) continue;
@@ -1037,18 +1036,13 @@ async function fetchWeWorkRemotelyJobs(timestamp?: number): Promise<Job[]> {
 }
 
 /**
- * Live fetcher for WorkingNomads remote tech API
+ * Live fetcher for WorkingNomads remote tech API (proxied via CodeSlot backend to prevent browser CORS blocks)
  */
-async function fetchWorkingNomadsJobs(timestamp?: number): Promise<Job[]> {
+async function fetchWorkingNomadsJobs(): Promise<Job[]> {
   try {
-    const cacheBust = timestamp ? `?_cb=${timestamp}` : '';
-    const res = await fetch(`https://www.workingnomads.com/api/exposed_jobs/${cacheBust}`, {
-      headers: { Accept: 'application/json' },
-      cache: timestamp ? 'no-store' : 'default'
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    if (!Array.isArray(data)) return [];
+    const res = await apiClient.get<any[]>('/jobs/external/workingnomads');
+    if (!res.success || !Array.isArray(res.data)) return [];
+    const data = res.data;
 
     return data
       .filter((item: any) => {
@@ -1089,11 +1083,10 @@ async function fetchWorkingNomadsJobs(timestamp?: number): Promise<Job[]> {
 async function fetchJobicyRegionalFeeds(timestamp?: number): Promise<Job[]> {
   const regions = ['europe', 'uk', 'apac', 'latam', 'canada'];
   const jobs: Job[] = [];
-  const cacheBust = timestamp ? `&_cb=${timestamp}` : '';
 
   for (const r of regions) {
     try {
-      const res = await fetch(`https://jobicy.com/api/v2/remote-jobs?count=40&geo=${r}${cacheBust}`, {
+      const res = await fetch(`https://jobicy.com/api/v2/remote-jobs?count=40&geo=${r}`, {
         headers: { Accept: 'application/json' },
         cache: timestamp ? 'no-store' : 'default'
       });
@@ -1131,10 +1124,9 @@ async function fetchJobicyRegionalFeeds(timestamp?: number): Promise<Job[]> {
  */
 async function fetchYCHiringStartups(timestamp?: number): Promise<Job[]> {
   try {
-    const cacheBust = timestamp ? `&_cb=${timestamp}` : '';
     // 1. Fetch the latest "Ask HN: Who is hiring?" story
     const storyRes = await fetch(
-      `https://hn.algolia.com/api/v1/search_by_date?tags=story,author_whoishiring&hitsPerPage=2${cacheBust}`,
+      `https://hn.algolia.com/api/v1/search_by_date?tags=story,author_whoishiring&hitsPerPage=2`,
       {
         headers: { Accept: 'application/json' },
         cache: timestamp ? 'no-store' : 'default'
@@ -1149,7 +1141,7 @@ async function fetchYCHiringStartups(timestamp?: number): Promise<Job[]> {
 
     // 2. Fetch top comments matching Remote / Engineer
     const commentsRes = await fetch(
-      `https://hn.algolia.com/api/v1/search?tags=comment,story_${storyId}&query=Remote&hitsPerPage=60${cacheBust}`,
+      `https://hn.algolia.com/api/v1/search?tags=comment,story_${storyId}&query=Remote&hitsPerPage=60`,
       {
         headers: { Accept: 'application/json' },
         cache: timestamp ? 'no-store' : 'default'
@@ -1262,8 +1254,7 @@ async function fetchYCHiringStartups(timestamp?: number): Promise<Job[]> {
  */
 async function fetchJobicyUSAStartups(timestamp?: number): Promise<Job[]> {
   try {
-    const cacheBust = timestamp ? `&_cb=${timestamp}` : '';
-    const res = await fetch(`https://jobicy.com/api/v2/remote-jobs?count=50&geo=usa${cacheBust}`, {
+    const res = await fetch(`https://jobicy.com/api/v2/remote-jobs?count=50&geo=usa`, {
       headers: { Accept: 'application/json' },
       cache: timestamp ? 'no-store' : 'default'
     });
@@ -1378,14 +1369,14 @@ export async function fetchRealJobs(forceRefresh: boolean = false): Promise<Job[
         ...fetchOpts
       }).then((r) => (r.ok ? r.json() : null)),
 
-      // 4. Jobicy Engineering
-      fetch(`https://jobicy.com/api/v2/remote-jobs?count=100&industry=engineering${cb}`, {
+      // 4. Jobicy Engineering (max count 50, no invalid query params)
+      fetch(`https://jobicy.com/api/v2/remote-jobs?count=50&industry=engineering`, {
         headers: { Accept: 'application/json' },
         ...fetchOpts
       }).then((r) => (r.ok ? r.json() : null)),
 
-      // 5. Jobicy Dev
-      fetch(`https://jobicy.com/api/v2/remote-jobs?count=100&industry=dev${cb}`, {
+      // 5. Jobicy Dev (max count 50, no invalid query params)
+      fetch(`https://jobicy.com/api/v2/remote-jobs?count=50&industry=dev`, {
         headers: { Accept: 'application/json' },
         ...fetchOpts
       }).then((r) => (r.ok ? r.json() : null)),
@@ -1411,8 +1402,8 @@ export async function fetchRealJobs(forceRefresh: boolean = false): Promise<Job[
       // 10. WeWorkRemotely Global RSS feeds
       fetchWeWorkRemotelyJobs(timestamp),
 
-      // 11. WorkingNomads Global Tech API
-      fetchWorkingNomadsJobs(timestamp),
+      // 11. WorkingNomads Global Tech API (Proxied through backend)
+      fetchWorkingNomadsJobs(),
 
       // 12. Jobicy Regional Tech Feeds (Europe, UK, APAC, LATAM, Canada)
       fetchJobicyRegionalFeeds(timestamp)
@@ -1527,19 +1518,24 @@ export async function fetchRealJobs(forceRefresh: boolean = false): Promise<Job[
     console.warn('Network fetch completed with fallbacks:', globalErr);
   }
 
-  // Deduplicate by clean title + company name
-  const seenKeys = new Set<string>();
+  // Deduplicate strictly by ID AND by (clean title + company name)
+  const seenIds = new Set<string>();
+  const seenTitles = new Set<string>();
   const deduplicated: Job[] = [];
 
   for (const job of collected) {
+    if (!job || !job.id) continue;
     const cleanTitle = String(job.title || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const cleanCompany = String(job.company_name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    const key = `${cleanTitle}-${cleanCompany}`;
+    const titleKey = `${cleanTitle}-${cleanCompany}`;
 
-    if (!seenKeys.has(key)) {
-      seenKeys.add(key);
-      deduplicated.push(job);
+    if (seenIds.has(job.id) || seenTitles.has(titleKey)) {
+      continue;
     }
+
+    seenIds.add(job.id);
+    seenTitles.add(titleKey);
+    deduplicated.push(job);
   }
 
   // Sort: featured first, then recent publication date
@@ -1604,7 +1600,18 @@ export async function toggleSaveJobBackend(
  */
 export async function applyJobBackend(
   jobId: string,
-  details: { resumeVersion?: string; matchScore?: number; notes?: string; salaryRange?: string } = {}
+  details: {
+    resumeVersion?: string;
+    matchScore?: number;
+    notes?: string;
+    salaryRange?: string;
+    jobTitle?: string;
+    company?: string;
+    companyLogo?: string;
+    sourceUrl?: string;
+    category?: string;
+    candidateRequiredLocation?: string;
+  } = {}
 ): Promise<boolean> {
   try {
     const res = await apiClient.post(`/jobs/${jobId}/apply`, {

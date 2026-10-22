@@ -78,7 +78,7 @@ export class ResumeService {
 
     let result: AITailorResult;
 
-    if (apiKey && apiKey.length > 5 && apiKey !== 'your_gemini_api_key_here') {
+    if (apiKey && apiKey.length > 5 && apiKey !== 'your_gemini_api_key_here' && config.env !== 'test') {
       try {
         result = await this.callGeminiAPI(request, apiKey);
       } catch (err) {
@@ -190,31 +190,72 @@ You MUST respond with a single valid JSON object with the following structure:
 }
 `;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.25,
-          topP: 0.95,
-        },
-      }),
-    });
+    const cleanKey = apiKey.trim().replace(/^["']|["']$/g, '');
+    const candidateModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    let lastError: Error | null = null;
+    let data: any = null;
 
-    if (!response.ok) {
-      throw new Error(`Gemini API returned status ${response.status}`);
+    for (const model of candidateModels) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(cleanKey)}`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        let response: Response;
+        try {
+          response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-goog-api-key': cleanKey,
+            },
+            signal: controller.signal,
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                responseMimeType: 'application/json',
+                temperature: 0.25,
+                topP: 0.95,
+              },
+            }),
+          });
+        } finally {
+          clearTimeout(timeoutId);
+        }
+
+        if (response.ok) {
+          data = await response.json();
+          break;
+        }
+
+        const errJson = (await response.json().catch(() => ({}))) as any;
+        const errMsg = errJson?.error?.message || `Gemini API returned status ${response.status}`;
+        lastError = new Error(errMsg);
+
+        // If 404 or model not found, try next candidate model
+        if (response.status === 404 || errMsg.toLowerCase().includes('not found')) {
+          continue;
+        }
+
+        throw lastError;
+      } catch (err: any) {
+        lastError = err;
+        if (lastError?.message && !lastError.message.toLowerCase().includes('not found') && !lastError.message.includes('404')) {
+          throw lastError;
+        }
+      }
     }
 
-    const data = (await response.json()) as any;
+    if (!data) {
+      throw lastError || new Error('No candidate content returned by Gemini');
+    }
+
     const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!rawText) {
       throw new Error('No candidate content returned by Gemini');
     }
 
-    const parsed = JSON.parse(rawText) as AITailorResult;
+    const cleanedText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(cleanedText) as AITailorResult;
     return parsed;
   }
 
