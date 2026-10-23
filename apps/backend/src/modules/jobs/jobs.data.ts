@@ -230,4 +230,80 @@ export const INITIAL_CURATED_JOBS: Job[] = [
     company_website: 'https://www.anthropic.com',
     featured: true,
   },
+  {
+    id: 'cs-personio-fullstack-de',
+    title: 'Senior Fullstack Entwickler (m/w/d) - TypeScript & Cloud Platform',
+    company_name: 'Personio',
+    company_logo: 'https://www.google.com/s2/favicons?domain=personio.de&sz=128',
+    category: 'Full Stack',
+    specialization: 'Full Stack',
+    experienceLevel: 'senior',
+    job_type: 'Full-time',
+    candidate_required_location: 'Germany / EU (Remote)',
+    salary: '€85,000 - €115,000',
+    publication_date: '2026-09-22T08:00:00Z',
+    description: `<h3>Über Personio</h3>
+<p>Personio ist Europas führende HR-Software für kleine und mittelständische Unternehmen. Wir suchen einen passionierten Senior Fullstack Entwickler für den Ausbau unserer cloud-basierten Plattform.</p>
+<h4>Deine Aufgaben</h4>
+<ul>
+  <li>Architektur und Entwicklung von skalierbaren Microservices mit TypeScript, React und Node.js auf AWS.</li>
+  <li>Zusammenarbeit mit Produktmanagern und Designern in einem agilen, cross-funktionalen Entwicklungsteam.</li>
+  <li>Code Reviews, Mentoring von Junior Entwicklern und kontinuierliche Verbesserung unserer CI/CD-Pipelines.</li>
+</ul>
+<h4>Dein Profil & Anforderungen</h4>
+<ul>
+  <li>Mindestens 5 Jahre professionelle Erfahrung in moderner Fullstack-Entwicklung (React, TypeScript, Node.js).</li>
+  <li>Fundierte Kenntnisse im Umgang mit relationalen Datenbanken (PostgreSQL) und Cloud-Architekturen (AWS/Kubernetes).</li>
+  <li>Fließende Deutschkenntnisse in Wort und Schrift sind für diese Position zwingend erforderlich (C1/C2 Niveau).</li>
+</ul>
+<h4>Das bieten wir dir</h4>
+<ul>
+  <li>Attraktive Vergütung und unbefristete Festanstellung mit 30 Tagen Urlaub.</li>
+  <li>100% Homeoffice und flexible Arbeitszeiten für optimale Work-Life-Balance.</li>
+  <li>Jährliches Weiterbildungsbudget von 1.500 € für Konferenzen und Zertifizierungen.</li>
+</ul>`,
+    url: 'https://www.personio.de/karriere',
+    tags: ['TypeScript', 'React', 'Node.js', 'AWS', 'PostgreSQL', 'Full Stack', 'German Required'],
+    source: 'Arbeitnow Tech Feed',
+    company_website: 'https://www.personio.de',
+    featured: true,
+  },
+  {
+    id: 'cs-qonto-backend-fr',
+    title: 'Développeur Backend Senior (H/F) - Go & Architecture Microservices',
+    company_name: 'Qonto',
+    company_logo: 'https://www.google.com/s2/favicons?domain=qonto.com&sz=128',
+    category: 'Backend',
+    specialization: 'Backend',
+    experienceLevel: 'senior',
+    job_type: 'Full-time',
+    candidate_required_location: 'France / EMEA (Télétravail)',
+    salary: '€80,000 - €105,000 + Equity',
+    publication_date: '2026-09-21T10:30:00Z',
+    description: `<h3>À propos de Qonto</h3>
+<p>Qonto est la solution financière leader des PME et indépendants en Europe. Nous recherchons un Développeur Backend Senior pour renforcer notre équipe Infrastructure Financière.</p>
+<h4>Vos missions</h4>
+<ul>
+  <li>Concevoir et développer des API bancaires résilientes et hautement sécurisées en Go.</li>
+  <li>Participer à l'évolution de notre architecture orientée événements avec Kafka et Kubernetes.</li>
+  <li>Garantir la fiabilité et la haute disponibilité des transactions financières 24/7.</li>
+</ul>
+<h4>Profil recherché</h4>
+<ul>
+  <li>Au moins 5 ans d'expérience en ingénierie logicielle backend distribuée (Go, Ruby ou Python).</li>
+  <li>Solides compétences en bases de données transactionnelles (PostgreSQL) et architecture microservices.</li>
+  <li>La maîtrise courante du français (oral et écrit) est obligatoire pour les échanges quotidiens avec les équipes produit.</li>
+</ul>
+<h4>Avantages</h4>
+<ul>
+  <li>Rémunération attractive avec plan de stock-options (BSPCE).</li>
+  <li>Télétravail complet avec budget d'équipement ergonomique de 800 €.</li>
+  <li>Mutuelle Alan prise en charge à 100% et tickets restaurant Swile.</li>
+</ul>`,
+    url: 'https://qonto.com/fr/careers',
+    tags: ['Go', 'Kafka', 'Kubernetes', 'PostgreSQL', 'Backend', 'French Required'],
+    source: 'Qonto Careers',
+    company_website: 'https://qonto.com',
+    featured: false,
+  },
 ];

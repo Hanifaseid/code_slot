@@ -152,7 +152,7 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium focus:outline-hidden focus:ring-1 focus:ring-neutral-900"
+            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium hover:border-orange-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
           >
             <option value="all">All Account Statuses</option>
             <option value="active">Active Only</option>
@@ -166,7 +166,7 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium focus:outline-hidden focus:ring-1 focus:ring-neutral-900"
+            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium hover:border-orange-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
           >
             <option value="all">All Roles</option>
             <option value="candidate">Candidates</option>

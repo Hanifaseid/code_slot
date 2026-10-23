@@ -123,7 +123,7 @@ export const AdminApplicationsView: React.FC<AdminApplicationsViewProps> = ({
           <select
             value={selectedCompany}
             onChange={(e) => setSelectedCompany(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium focus:outline-hidden focus:ring-1 focus:ring-neutral-900"
+            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium hover:border-orange-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
           >
             {companies.map((c) => (
               <option key={c} value={c}>
@@ -195,7 +195,7 @@ export const AdminApplicationsView: React.FC<AdminApplicationsViewProps> = ({
                           <select
                             value={app.stage}
                             onChange={(e) => onUpdateStage(app.id, e.target.value as ApplicationStage)}
-                            className="text-[10px] bg-neutral-100 hover:bg-neutral-200 rounded-lg px-2 py-1 font-bold text-neutral-800 border-none cursor-pointer"
+                            className="text-[10px] bg-neutral-100 hover:bg-orange-50 hover:text-orange-950 hover:border-orange-300 rounded-lg px-2 py-1 font-bold text-neutral-800 border border-neutral-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-200 accent-orange-500 cursor-pointer transition-colors"
                           >
                             <option value="applied">Submitted</option>
                             <option value="screening">Screening</option>
@@ -254,7 +254,7 @@ export const AdminApplicationsView: React.FC<AdminApplicationsViewProps> = ({
                       <select
                         value={app.stage}
                         onChange={(e) => onUpdateStage(app.id, e.target.value as ApplicationStage)}
-                        className="px-2.5 py-1 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-semibold text-xs border border-neutral-200 cursor-pointer"
+                        className="px-2.5 py-1 rounded-xl bg-neutral-100 hover:bg-orange-50 hover:text-orange-950 hover:border-orange-300 text-neutral-800 font-semibold text-xs border border-neutral-200 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-200 accent-orange-500 cursor-pointer transition-colors"
                       >
                         <option value="applied">Submitted</option>
                         <option value="screening">Screening</option>

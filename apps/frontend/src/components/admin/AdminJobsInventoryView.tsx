@@ -143,7 +143,7 @@ export const AdminJobsInventoryView: React.FC<AdminJobsInventoryViewProps> = ({ 
           <select
             value={selectedSource}
             onChange={(e) => setSelectedSource(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium focus:outline-hidden focus:ring-1 focus:ring-neutral-900"
+            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium hover:border-orange-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
           >
             <option value="all">All Sourced Feeds</option>
             <option value="yc">Y Combinator</option>
@@ -270,7 +270,7 @@ export const AdminJobsInventoryView: React.FC<AdminJobsInventoryViewProps> = ({ 
                 <select
                   value={experienceLevel}
                   onChange={(e) => setExperienceLevel(e.target.value as any)}
-                  className="w-full px-3 py-2 rounded-xl bg-neutral-50 border border-neutral-200 text-neutral-900 text-xs focus:ring-1 focus:ring-neutral-900 focus:outline-hidden"
+                  className="w-full px-3 py-2 rounded-xl bg-neutral-50 border border-neutral-200 text-neutral-900 text-xs hover:border-orange-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
                 >
                   <option value="Junior">🌱 Junior (0–2 years)</option>
                   <option value="Intermediate">🚀 Intermediate / Mid-Level (2–5 years)</option>

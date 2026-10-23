@@ -1,6 +1,7 @@
 import React from 'react';
 import { Job } from '../types';
 import { formatRelativeDate, getJobExperienceLevel } from '../services/jobService';
+import { detectJobLanguage } from '../services/languageService';
 import { MapPin, DollarSign, Clock, Bookmark, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { CompanyLogo } from './CompanyLogo';
 
@@ -20,6 +21,7 @@ export const JobListItem: React.FC<JobListItemProps> = ({
   const tagsList = Array.isArray(job.tags) ? job.tags.filter(Boolean).map(String) : [];
   const jobSource = String(job.source || '').toLowerCase();
   const experienceLevel = getJobExperienceLevel(job);
+  const detectedLang = detectJobLanguage(job.title, job.description);
 
   const isYCStartup =
     jobSource.includes('y combinator') ||
@@ -51,7 +53,7 @@ export const JobListItem: React.FC<JobListItemProps> = ({
                 experienceLevel === 'Junior'
                   ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                   : experienceLevel === 'Intermediate'
-                  ? 'bg-sky-50 text-sky-800 border border-sky-200'
+                  ? 'bg-orange-50 text-orange-900 border border-orange-200'
                   : experienceLevel === 'Senior'
                   ? 'bg-amber-50 text-amber-900 border border-amber-200'
                   : 'bg-purple-50 text-purple-900 border border-purple-200'
@@ -62,6 +64,14 @@ export const JobListItem: React.FC<JobListItemProps> = ({
               {experienceLevel === 'Senior' && '⚡ Senior'}
               {experienceLevel === 'Lead' && '👑 Staff / Lead'}
             </span>
+            {detectedLang.isForeign && (
+              <span
+                className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-950 border border-amber-300 shadow-2xs inline-flex items-center gap-1"
+                title={`Speaking ${detectedLang.name} (${detectedLang.nativeName}) is mandatory for this role`}
+              >
+                <span>🗣️ {detectedLang.name} Mandatory</span>
+              </span>
+            )}
             <h3 className="font-sans font-bold text-[15px] sm:text-base text-neutral-950 group-hover:text-neutral-700 transition-colors">
               {job.title}
             </h3>

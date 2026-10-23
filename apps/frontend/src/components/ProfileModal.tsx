@@ -243,7 +243,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   <select
                     value={specialization}
                     onChange={(e) => setSpecialization(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-900 text-xs font-medium focus:outline-none focus:border-neutral-900"
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-900 text-xs font-medium focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
                   >
                     <option value="Full Stack">Full Stack</option>
                     <option value="Backend">Backend Systems</option>

@@ -192,17 +192,23 @@ export const JobFiltersBar: React.FC<JobFiltersBarProps> = ({
         </div>
       </div>
 
-      {/* Secondary Dropdown Row (Source, Employment type, Location, Sort, Reset, Results) */}
+      {/* Secondary Dropdown Row (Source, Seniority, Employment type, Location, Sort, Reset, Results) */}
       <div className="pt-3 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Source dropdown: YC Startups, USA Startups, Remotive, Jobicy, RemoteOK, Arbeitnow */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-50 border border-neutral-200/80 text-neutral-700">
-            <Rocket className="w-3.5 h-3.5 text-orange-600" />
+          <div
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer shadow-2xs group ${
+              filters.source && filters.source !== 'all'
+                ? 'bg-orange-50 border-orange-300 text-orange-950 ring-1 ring-orange-200/60'
+                : 'bg-neutral-50/80 border-neutral-200/90 text-neutral-700 hover:border-orange-400 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-100/80'
+            }`}
+          >
+            <Rocket className="w-3.5 h-3.5 text-orange-600 shrink-0" />
             <select
               id="filter-source"
               value={filters.source || 'all'}
               onChange={(e) => onChange({ source: e.target.value, startupOnly: e.target.value === 'startups' || e.target.value === 'yc' })}
-              className="bg-transparent text-neutral-800 font-semibold focus:outline-none cursor-pointer"
+              className="bg-transparent text-neutral-800 font-semibold focus:outline-none cursor-pointer accent-orange-500"
             >
               <option value="all">All Sources & Live Feeds</option>
               <option value="yc">🚀 Y Combinator / YC Startups</option>
@@ -218,13 +224,19 @@ export const JobFiltersBar: React.FC<JobFiltersBarProps> = ({
           </div>
 
           {/* Experience Level dropdown */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-50 border border-neutral-200/80 text-neutral-700">
-            <Award className="w-3.5 h-3.5 text-amber-600" />
+          <div
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer shadow-2xs group ${
+              filters.experienceLevel && filters.experienceLevel !== 'all'
+                ? 'bg-orange-50 border-orange-300 text-orange-950 ring-1 ring-orange-200/60'
+                : 'bg-neutral-50/80 border-neutral-200/90 text-neutral-700 hover:border-orange-400 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-100/80'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5 text-orange-600 shrink-0" />
             <select
               id="filter-experience-level"
               value={filters.experienceLevel || 'all'}
               onChange={(e) => onChange({ experienceLevel: e.target.value })}
-              className="bg-transparent text-neutral-800 font-semibold focus:outline-none cursor-pointer"
+              className="bg-transparent text-neutral-800 font-semibold focus:outline-none cursor-pointer accent-orange-500"
             >
               <option value="all">All Seniority Levels</option>
               <option value="junior">🌱 Junior / Entry (0-2 yrs)</option>
@@ -235,13 +247,19 @@ export const JobFiltersBar: React.FC<JobFiltersBarProps> = ({
           </div>
 
           {/* Job Type dropdown */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-50 border border-neutral-200/80 text-neutral-700">
-            <Briefcase className="w-3.5 h-3.5 text-neutral-400" />
+          <div
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer shadow-2xs group ${
+              filters.jobType && filters.jobType !== 'all'
+                ? 'bg-orange-50 border-orange-300 text-orange-950 ring-1 ring-orange-200/60'
+                : 'bg-neutral-50/80 border-neutral-200/90 text-neutral-700 hover:border-orange-400 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-100/80'
+            }`}
+          >
+            <Briefcase className="w-3.5 h-3.5 text-orange-500 shrink-0" />
             <select
               id="filter-job-type"
               value={filters.jobType}
               onChange={(e) => onChange({ jobType: e.target.value })}
-              className="bg-transparent text-neutral-800 font-semibold focus:outline-none cursor-pointer"
+              className="bg-transparent text-neutral-800 font-semibold focus:outline-none cursor-pointer accent-orange-500"
             >
               <option value="all">All Employment Types</option>
               <option value="Full-time">Full-time Roles</option>
@@ -251,13 +269,19 @@ export const JobFiltersBar: React.FC<JobFiltersBarProps> = ({
           </div>
 
           {/* Location dropdown */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-50 border border-neutral-200/80 text-neutral-700">
-            <Globe className="w-3.5 h-3.5 text-neutral-400" />
+          <div
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer shadow-2xs group ${
+              filters.location && filters.location !== 'all'
+                ? 'bg-orange-50 border-orange-300 text-orange-950 ring-1 ring-orange-200/60'
+                : 'bg-neutral-50/80 border-neutral-200/90 text-neutral-700 hover:border-orange-400 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-100/80'
+            }`}
+          >
+            <Globe className="w-3.5 h-3.5 text-orange-500 shrink-0" />
             <select
               id="filter-location"
               value={filters.location}
               onChange={(e) => onChange({ location: e.target.value })}
-              className="bg-transparent text-neutral-800 font-semibold focus:outline-none cursor-pointer"
+              className="bg-transparent text-neutral-800 font-semibold focus:outline-none cursor-pointer accent-orange-500"
             >
               <option value="all">Any Remote Location</option>
               <option value="worldwide">Worldwide / Anywhere</option>
@@ -267,13 +291,19 @@ export const JobFiltersBar: React.FC<JobFiltersBarProps> = ({
           </div>
 
           {/* Sort By */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-50 border border-neutral-200/80 text-neutral-700">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-400" />
+          <div
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer shadow-2xs group ${
+              filters.sortBy && filters.sortBy !== 'recent'
+                ? 'bg-orange-50 border-orange-300 text-orange-950 ring-1 ring-orange-200/60'
+                : 'bg-neutral-50/80 border-neutral-200/90 text-neutral-700 hover:border-orange-400 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-100/80'
+            }`}
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5 text-orange-500 shrink-0" />
             <select
               id="filter-sort-by"
               value={filters.sortBy}
               onChange={(e) => onChange({ sortBy: e.target.value as any })}
-              className="bg-transparent text-neutral-800 font-semibold focus:outline-none cursor-pointer"
+              className="bg-transparent text-neutral-800 font-semibold focus:outline-none cursor-pointer accent-orange-500"
             >
               <option value="recent">Sort: Most Recent</option>
               <option value="salary">Sort: Compensation</option>

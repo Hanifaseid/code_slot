@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Job } from '../types';
 import { formatRelativeDate, cleanAndFormatDescription, applyJobBackend } from '../services/jobService';
+import { detectJobLanguage, translateJobToEnglish } from '../services/languageService';
 import { CompanyLogo } from './CompanyLogo';
 import { AITailorResult, ResumeData } from '../types/resume';
 import { tailorResumeWithAI } from '../services/aiResumeService';
@@ -25,6 +26,7 @@ import {
   Rocket,
   Send,
   Loader2,
+  Languages,
   X,
 } from 'lucide-react';
 
@@ -57,6 +59,36 @@ export const JobDetailPage: React.FC<JobDetailPageProps> = ({
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [applySuccessNotice, setApplySuccessNotice] = useState(false);
+
+  // Foreign language detection and dynamic translation
+  const detectedLang = detectJobLanguage(job.title, job.description);
+  const [isTranslated, setIsTranslated] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translationData, setTranslationData] = useState<{
+    translatedTitle: string;
+    translatedDescription: string;
+  } | null>(null);
+
+  const handleToggleTranslate = async () => {
+    if (isTranslated) {
+      setIsTranslated(false);
+      return;
+    }
+    if (translationData) {
+      setIsTranslated(true);
+      return;
+    }
+    setIsTranslating(true);
+    try {
+      const res = await translateJobToEnglish(job.id, job.title, job.description, detectedLang);
+      setTranslationData(res);
+      setIsTranslated(true);
+    } catch (err) {
+      console.error('Translation error:', err);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   const handleSubmitApplication = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,6 +244,59 @@ export const JobDetailPage: React.FC<JobDetailPageProps> = ({
           </div>
         </div>
 
+        {/* Foreign Language Notice & Translation Banner */}
+        {detectedLang.isForeign && (
+          <div className="rounded-3xl bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border-2 border-orange-300/80 p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all">
+            <div className="flex items-start gap-3.5 min-w-0">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-xl">
+                🗣️
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-200/90 text-amber-950 border border-amber-300">
+                    Mandatory Language Requirement
+                  </span>
+                  <span className="text-xs font-bold text-amber-900">
+                    Original Post: {detectedLang.name} ({detectedLang.nativeName})
+                  </span>
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-neutral-950 tracking-tight">
+                  Speaking {detectedLang.name} ({detectedLang.nativeName}) is mandatory for this job.
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-600 mt-1 leading-relaxed">
+                  Daily standups, architectural documentation, and team collaboration require fluency in {detectedLang.name}.
+                </p>
+              </div>
+            </div>
+
+            {/* Translation Button */}
+            <button
+              id="translate-job-btn"
+              type="button"
+              onClick={handleToggleTranslate}
+              disabled={isTranslating}
+              className="shrink-0 inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-neutral-950 hover:bg-neutral-800 text-white text-xs sm:text-sm font-bold tracking-tight shadow-md hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer"
+            >
+              {isTranslating ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-orange-400" />
+                  <span>Translating to English...</span>
+                </>
+              ) : isTranslated ? (
+                <>
+                  <Languages className="w-4 h-4 text-orange-400" />
+                  <span>Show Original ({detectedLang.name})</span>
+                </>
+              ) : (
+                <>
+                  <Languages className="w-4 h-4 text-orange-400" />
+                  <span>Translate to English 🇺🇸</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
+
         {/* Hero Header Card - Full Width Fluid */}
         <div className="bg-white rounded-3xl border border-neutral-200/90 p-6 sm:p-10 shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-8">
@@ -249,8 +334,17 @@ export const JobDetailPage: React.FC<JobDetailPageProps> = ({
                 </div>
 
                 <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl text-neutral-950 font-normal tracking-tight leading-snug">
-                  {job.title}
+                  {isTranslated && translationData ? translationData.translatedTitle : job.title}
                 </h1>
+
+                {isTranslated && (
+                  <div className="mt-2">
+                    <span className="inline-flex items-center gap-1.5 text-xs text-orange-800 font-semibold bg-orange-50 px-3 py-1 rounded-full border border-orange-200">
+                      <Sparkles className="w-3.5 h-3.5 text-orange-600" />
+                      <span>Translated to English from {detectedLang.name}</span>
+                    </span>
+                  </div>
+                )}
 
                 {/* Key Meta Badges */}
                 <div className="flex flex-wrap items-center gap-y-2 gap-x-5 mt-4 text-xs sm:text-sm text-neutral-600">
@@ -268,6 +362,12 @@ export const JobDetailPage: React.FC<JobDetailPageProps> = ({
                     <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200/70 text-xs sm:text-sm">
                       <DollarSign className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span>{job.salary}</span>
+                    </span>
+                  )}
+
+                  {detectedLang.isForeign && (
+                    <span className="inline-flex items-center gap-1 font-bold text-amber-950 bg-amber-100/90 px-3 py-1 rounded-lg border border-amber-300 text-xs sm:text-sm">
+                      <span>🗣️ {detectedLang.name} Mandatory</span>
                     </span>
                   )}
 
@@ -383,7 +483,11 @@ export const JobDetailPage: React.FC<JobDetailPageProps> = ({
             {/* Description Render */}
             <div
               className="job-description-content text-neutral-800 text-sm sm:text-base leading-relaxed max-w-none font-sans"
-              dangerouslySetInnerHTML={{ __html: cleanAndFormatDescription(job.description) }}
+              dangerouslySetInnerHTML={{
+                __html: cleanAndFormatDescription(
+                  isTranslated && translationData ? translationData.translatedDescription : job.description
+                ),
+              }}
             />
 
             {/* Bottom Apply CTA Card */}
@@ -420,6 +524,15 @@ export const JobDetailPage: React.FC<JobDetailPageProps> = ({
               </h3>
 
               <div className="space-y-3.5 text-xs text-neutral-600">
+                {detectedLang.isForeign && (
+                  <div className="flex items-center justify-between py-1.5 border-b border-neutral-100">
+                    <span className="text-neutral-500">Language Requirement</span>
+                    <span className="font-bold text-amber-950 bg-amber-100/90 border border-amber-300 px-2 py-0.5 rounded-md text-[11px]">
+                      🗣️ {detectedLang.name} (Mandatory)
+                    </span>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between py-1.5 border-b border-neutral-100">
                   <span className="text-neutral-500">Track</span>
                   <span className="font-bold text-neutral-900">{job.specialization || job.category}</span>
