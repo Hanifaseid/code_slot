@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Job, JobFilters, UserSession } from '../types';
-import { fetchRealJobs } from '../services/jobService';
+import { fetchRealJobs, getJobExperienceLevel } from '../services/jobService';
 import { JobCard } from './JobCard';
 import { JobListItem } from './JobListItem';
 import { JobFiltersBar } from './JobFiltersBar';
@@ -55,6 +55,7 @@ export const JobsPortal: React.FC<JobsPortalProps> = ({
   const [filters, setFilters] = useState<JobFilters>({
     search: '',
     category: 'all',
+    experienceLevel: 'all',
     jobType: 'all',
     location: 'all',
     source: 'all',
@@ -238,6 +239,21 @@ export const JobsPortal: React.FC<JobsPortalProps> = ({
           if (!matchesSpec && !matchesCombined) {
             return false;
           }
+        }
+      }
+
+      // Experience Level / Seniority Filter (Junior, Intermediate, Senior, Lead)
+      if (filters.experienceLevel && filters.experienceLevel !== 'all') {
+        const lvl = getJobExperienceLevel(job).toLowerCase();
+        const targetLvl = filters.experienceLevel.toLowerCase();
+        if (targetLvl === 'junior' && lvl !== 'junior') {
+          return false;
+        } else if (targetLvl === 'intermediate' && lvl !== 'intermediate') {
+          return false;
+        } else if (targetLvl === 'senior' && lvl !== 'senior') {
+          return false;
+        } else if (targetLvl === 'lead' && lvl !== 'lead') {
+          return false;
         }
       }
 

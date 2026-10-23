@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Briefcase, LogOut, Sparkles } from 'lucide-react';
+import { Menu, X, Briefcase, LogOut, Sparkles, Shield } from 'lucide-react';
 import { UserSession } from '../types';
 
 interface NavbarProps {
@@ -13,6 +13,7 @@ interface NavbarProps {
   onLogout?: () => void;
   onAiResumeClick?: () => void;
   onProfileClick?: () => void;
+  onAdminClick?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -26,9 +27,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
   onAiResumeClick,
   onProfileClick,
+  onAdminClick,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const isAdmin =
+    currentUser?.role === 'admin' ||
+    currentUser?.email === 'admin@gmail.com';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -81,7 +87,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Desktop Nav Items */}
           <nav className="hidden md:flex items-center gap-5 text-[13px] font-medium text-neutral-700">
-         
+            {isAdmin && (
+              <button
+                id="nav-admin-console-btn"
+                onClick={onAdminClick || (() => { window.location.hash = 'admin'; })}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs shadow-xs transition-all cursor-pointer animate-pulse"
+                title="Open Admin Portal Console"
+              >
+                <Shield className="w-3.5 h-3.5" />
+                <span>Admin Console</span>
+              </button>
+            )}
 
             {currentUser ? (
               <>

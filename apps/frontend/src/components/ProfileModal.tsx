@@ -37,6 +37,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [location, setLocation] = useState('');
   const [skills, setSkills] = useState('');
   const [specialization, setSpecialization] = useState('Full Stack');
+  const [experienceLevel, setExperienceLevel] = useState<'Junior' | 'Intermediate' | 'Senior' | 'Lead'>('Senior');
   const [githubUrl, setGithubUrl] = useState('');
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [portfolioUrl, setPortfolioUrl] = useState('');
@@ -61,6 +62,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           setLocation(u.location || '');
           setSkills(Array.isArray(u.skills) ? u.skills.join(', ') : '');
           setSpecialization(u.specialization || 'Full Stack');
+          setExperienceLevel(u.experienceLevel || (currentUser.experienceLevel as any) || 'Senior');
           setGithubUrl(u.githubUrl || '');
           setLinkedinUrl(u.linkedinUrl || '');
           setPortfolioUrl(u.portfolioUrl || '');
@@ -90,6 +92,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         location,
         skills: skillsArray,
         specialization,
+        experienceLevel,
         githubUrl,
         linkedinUrl,
         portfolioUrl,
@@ -102,6 +105,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           name: u.name,
           title: u.title,
           location: u.location,
+          experienceLevel: u.experienceLevel || experienceLevel,
           savedJobIds: u.savedJobIds || currentUser.savedJobIds || [],
           appliedJobIds: u.appliedJobIds || currentUser.appliedJobIds || [],
         };
@@ -248,6 +252,37 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     <option value="DevOps / Cloud">DevOps & Cloud Infra</option>
                     <option value="Mobile">Mobile Engineering</option>
                   </select>
+                </div>
+              </div>
+
+              {/* Experience / Seniority Level */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-neutral-700 uppercase tracking-wider">
+                  Seniority & Experience Level
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { id: 'Junior', label: '🌱 Junior', desc: '0–2 yrs' },
+                    { id: 'Intermediate', label: '🚀 Intermediate', desc: '2–5 yrs' },
+                    { id: 'Senior', label: '⚡ Senior', desc: '5+ yrs' },
+                    { id: 'Lead', label: '👑 Staff / Lead', desc: '8+ yrs' },
+                  ].map((lvl) => (
+                    <button
+                      key={lvl.id}
+                      type="button"
+                      onClick={() => setExperienceLevel(lvl.id as any)}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                        experienceLevel === lvl.id
+                          ? 'border-neutral-950 bg-neutral-950 text-white shadow-xs'
+                          : 'border-neutral-200 bg-neutral-50/60 text-neutral-800 hover:bg-neutral-100 hover:border-neutral-300'
+                      }`}
+                    >
+                      <div className="font-bold text-xs">{lvl.label}</div>
+                      <div className={`text-[10px] mt-0.5 ${experienceLevel === lvl.id ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                        {lvl.desc}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
 

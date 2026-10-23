@@ -396,6 +396,11 @@ export default function App() {
         currentUser={currentUser}
         onJobsClick={navigateToJobs}
         onLogout={handleLogout}
+        onAdminClick={() => {
+          setCurrentPage('admin');
+          window.location.hash = 'admin';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
         onAiResumeClick={() => (currentUser ? navigateToResume(null) : navigateToAuth('signin', 'resume'))}
         onRequestAccess={() => (currentUser ? navigateToJobs() : navigateToAuth('signin', 'jobs'))}
         onHireClick={() => (currentUser ? navigateToJobs() : navigateToAuth('signin', 'jobs'))}

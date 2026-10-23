@@ -67,11 +67,15 @@ export type UserStatus = z.infer<typeof UserStatusSchema>;
 export const UserPlanSchema = z.enum(['Free', 'Pro Dev', 'Enterprise']);
 export type UserPlan = z.infer<typeof UserPlanSchema>;
 
+export const ExperienceLevelSchema = z.enum(['all', 'junior', 'intermediate', 'senior', 'lead']);
+export type ExperienceLevel = z.infer<typeof ExperienceLevelSchema>;
+
 export const RegisterRequestSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   name: z.string().min(2, 'Name must be at least 2 characters'),
   title: z.string().optional(),
+  experienceLevel: ExperienceLevelSchema.optional().default('intermediate'),
   role: UserRoleSchema.default('candidate'),
 });
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
@@ -96,6 +100,7 @@ export const UserProfileSchema = z.object({
   role: UserRoleSchema,
   status: UserStatusSchema.default('active'),
   plan: UserPlanSchema.default('Free'),
+  experienceLevel: z.string().optional(),
   location: z.string().optional(),
   skills: z.array(z.string()).default([]),
   specialization: z.string().optional(),
@@ -111,6 +116,7 @@ export type UserProfile = z.infer<typeof UserProfileSchema>;
 export const UpdateProfileRequestSchema = z.object({
   name: z.string().min(2).optional(),
   title: z.string().optional(),
+  experienceLevel: z.string().optional(),
   avatar: z.string().url().optional().or(z.literal('')),
   location: z.string().optional(),
   skills: z.array(z.string()).optional(),
@@ -140,6 +146,7 @@ export const JobSchema = z.object({
   company_logo: z.string().optional(),
   category: z.string(),
   specialization: z.string().optional(),
+  experienceLevel: z.string().optional(),
   job_type: z.string(),
   candidate_required_location: z.string(),
   salary: z.string().optional(),
@@ -157,6 +164,7 @@ export const JobQuerySchema = PaginationParamsSchema.extend({
   search: z.string().optional(),
   category: z.string().optional(),
   specialization: z.string().optional(),
+  experienceLevel: z.string().optional(),
   jobType: z.string().optional(),
   location: z.string().optional(),
   source: z.string().optional(),
@@ -180,6 +188,7 @@ export const CreateJobRequestSchema = z.object({
   company_logo: z.string().url().optional().or(z.literal('')),
   category: z.string().min(2),
   specialization: z.string().optional(),
+  experienceLevel: z.string().optional().default('intermediate'),
   job_type: z.string().default('Full-time'),
   candidate_required_location: z.string().default('Worldwide (Remote)'),
   salary: z.string().optional(),

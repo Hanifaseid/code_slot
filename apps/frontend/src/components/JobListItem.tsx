@@ -1,6 +1,6 @@
 import React from 'react';
 import { Job } from '../types';
-import { formatRelativeDate } from '../services/jobService';
+import { formatRelativeDate, getJobExperienceLevel } from '../services/jobService';
 import { MapPin, DollarSign, Clock, Bookmark, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { CompanyLogo } from './CompanyLogo';
 
@@ -19,6 +19,7 @@ export const JobListItem: React.FC<JobListItemProps> = ({
 }) => {
   const tagsList = Array.isArray(job.tags) ? job.tags.filter(Boolean).map(String) : [];
   const jobSource = String(job.source || '').toLowerCase();
+  const experienceLevel = getJobExperienceLevel(job);
 
   const isYCStartup =
     jobSource.includes('y combinator') ||
@@ -44,6 +45,22 @@ export const JobListItem: React.FC<JobListItemProps> = ({
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-neutral-100 text-neutral-800 border border-neutral-200/60">
               {job.specialization || job.category}
+            </span>
+            <span
+              className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                experienceLevel === 'Junior'
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  : experienceLevel === 'Intermediate'
+                  ? 'bg-sky-50 text-sky-800 border border-sky-200'
+                  : experienceLevel === 'Senior'
+                  ? 'bg-amber-50 text-amber-900 border border-amber-200'
+                  : 'bg-purple-50 text-purple-900 border border-purple-200'
+              }`}
+            >
+              {experienceLevel === 'Junior' && '🌱 Junior'}
+              {experienceLevel === 'Intermediate' && '🚀 Intermediate'}
+              {experienceLevel === 'Senior' && '⚡ Senior'}
+              {experienceLevel === 'Lead' && '👑 Staff / Lead'}
             </span>
             <h3 className="font-sans font-bold text-[15px] sm:text-base text-neutral-950 group-hover:text-neutral-700 transition-colors">
               {job.title}

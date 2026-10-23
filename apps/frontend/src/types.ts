@@ -22,6 +22,7 @@ export interface Job {
   company_logo?: string;
   category: string;
   specialization?: string; // 'Frontend' | 'Backend' | 'Full Stack' | 'DevOps / Cloud' | 'AI & Machine Learning' | 'Mobile' | 'Data & Analytics' | 'Security & QA' | 'Software Engineering'
+  experienceLevel?: 'Junior' | 'Intermediate' | 'Senior' | 'Lead' | string;
   job_type: string;
   candidate_required_location: string;
   salary?: string;
@@ -40,6 +41,7 @@ export interface UserSession {
   title?: string;
   avatar?: string;
   role?: 'admin' | 'candidate' | 'recruiter';
+  experienceLevel?: 'Junior' | 'Intermediate' | 'Senior' | 'Lead' | string;
   savedJobIds: string[];
   appliedJobIds: string[];
   location?: string;
@@ -54,6 +56,7 @@ export interface UserSession {
 export interface JobFilters {
   search: string;
   category: string;
+  experienceLevel?: string; // 'all' | 'junior' | 'intermediate' | 'senior' | 'lead'
   jobType: string;
   location: string;
   source: string; // 'all' | 'yc' | 'startups' | 'usa' | 'wwr' | 'remotive' | 'jobicy' | 'remoteok' | 'arbeitnow' | 'workingnomads'

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Job } from '../types';
-import { formatRelativeDate } from '../services/jobService';
+import { formatRelativeDate, getJobExperienceLevel } from '../services/jobService';
 import { MapPin, DollarSign, Clock, Bookmark, ArrowRight, Sparkles, Building2, CheckCircle2 } from 'lucide-react';
 import { CompanyLogo } from './CompanyLogo';
 
@@ -19,6 +19,7 @@ export const JobCard: React.FC<JobCardProps> = ({
 }) => {
   const tagsList = Array.isArray(job.tags) ? job.tags.filter(Boolean).map(String) : [];
   const jobSource = String(job.source || '').toLowerCase();
+  const experienceLevel = getJobExperienceLevel(job);
 
   const isYCStartup =
     jobSource.includes('y combinator') ||
@@ -94,10 +95,26 @@ export const JobCard: React.FC<JobCardProps> = ({
           </div>
         </div>
 
-        {/* Track badge */}
-        <div className="flex items-center gap-1.5 mb-1.5">
+        {/* Track badge & Experience Level */}
+        <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
           <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-neutral-100 text-neutral-800 border border-neutral-200/60">
             {job.specialization || job.category}
+          </span>
+          <span
+            className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold ${
+              experienceLevel === 'Junior'
+                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                : experienceLevel === 'Intermediate'
+                ? 'bg-sky-50 text-sky-800 border border-sky-200'
+                : experienceLevel === 'Senior'
+                ? 'bg-amber-50 text-amber-900 border border-amber-200'
+                : 'bg-purple-50 text-purple-900 border border-purple-200'
+            }`}
+          >
+            {experienceLevel === 'Junior' && '🌱 Junior'}
+            {experienceLevel === 'Intermediate' && '🚀 Intermediate'}
+            {experienceLevel === 'Senior' && '⚡ Senior'}
+            {experienceLevel === 'Lead' && '👑 Staff / Lead'}
           </span>
         </div>
 

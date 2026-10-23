@@ -28,6 +28,7 @@ export const AdminJobsInventoryView: React.FC<AdminJobsInventoryViewProps> = ({ 
   const [company, setCompany] = useState('');
   const [location, setLocation] = useState('Worldwide (Remote)');
   const [salary, setSalary] = useState('$180,000 - $230,000');
+  const [experienceLevel, setExperienceLevel] = useState<'Junior' | 'Intermediate' | 'Senior' | 'Lead'>('Senior');
   const [sourceUrl, setSourceUrl] = useState('https://linear.app/careers');
   const [tags, setTags] = useState('TypeScript, React, Node.js');
 
@@ -54,6 +55,7 @@ export const AdminJobsInventoryView: React.FC<AdminJobsInventoryViewProps> = ({ 
       company_name: company,
       category: 'Software Engineering',
       specialization: 'Full Stack',
+      experienceLevel,
       job_type: 'Full-time',
       candidate_required_location: location,
       salary,
@@ -261,6 +263,20 @@ export const AdminJobsInventoryView: React.FC<AdminJobsInventoryViewProps> = ({ 
                     className="w-full px-3 py-2 rounded-xl bg-neutral-50 border border-neutral-200 text-neutral-900 text-xs focus:ring-1 focus:ring-neutral-900 focus:outline-hidden"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-neutral-700 mb-1">Seniority / Experience Level</label>
+                <select
+                  value={experienceLevel}
+                  onChange={(e) => setExperienceLevel(e.target.value as any)}
+                  className="w-full px-3 py-2 rounded-xl bg-neutral-50 border border-neutral-200 text-neutral-900 text-xs focus:ring-1 focus:ring-neutral-900 focus:outline-hidden"
+                >
+                  <option value="Junior">🌱 Junior (0–2 years)</option>
+                  <option value="Intermediate">🚀 Intermediate / Mid-Level (2–5 years)</option>
+                  <option value="Senior">⚡ Senior Developer (5+ years)</option>
+                  <option value="Lead">👑 Staff / Lead / Principal (8+ years)</option>
+                </select>
               </div>
 
               <div>

@@ -21,6 +21,7 @@ interface InternalUserRecord {
   role: 'candidate' | 'recruiter' | 'admin';
   status: 'active' | 'idle' | 'suspended' | 'verified';
   plan: 'Free' | 'Pro Dev' | 'Enterprise';
+  experienceLevel?: string;
   location?: string;
   skills: string[];
   specialization?: string;
@@ -92,6 +93,7 @@ function toUserProfile(user: InternalUserRecord): UserProfile {
     role: user.role,
     status: user.status,
     plan: user.plan,
+    experienceLevel: user.experienceLevel || 'intermediate',
     location: user.location,
     skills: user.skills,
     specialization: user.specialization,
@@ -340,6 +342,7 @@ export class AuthService {
           role: dbUser.role as 'candidate' | 'recruiter' | 'admin',
           status: dbUser.status as 'active',
           plan: dbUser.plan as 'Free',
+          experienceLevel: (dbUser as any).experienceLevel || 'intermediate',
           location: dbUser.location || undefined,
           skills: dbUser.skills,
           specialization: dbUser.specialization || undefined,
@@ -398,6 +401,7 @@ export class AuthService {
         if (data.location !== undefined) user.location = data.location;
         if (data.skills !== undefined) user.skills = data.skills;
         if (data.specialization !== undefined) user.specialization = data.specialization;
+        if (data.experienceLevel !== undefined) user.experienceLevel = data.experienceLevel;
         if (data.githubUrl !== undefined) user.githubUrl = data.githubUrl;
         if (data.linkedinUrl !== undefined) user.linkedinUrl = data.linkedinUrl;
         if (data.portfolioUrl !== undefined) user.portfolioUrl = data.portfolioUrl;
@@ -437,6 +441,7 @@ export class AuthService {
             role: dbUser.role as 'candidate' | 'recruiter' | 'admin',
             status: dbUser.status as 'active',
             plan: dbUser.plan as 'Free',
+            experienceLevel: (dbUser as any).experienceLevel || 'intermediate',
             location: dbUser.location || undefined,
             skills: dbUser.skills,
             specialization: dbUser.specialization || undefined,

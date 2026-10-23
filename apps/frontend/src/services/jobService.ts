@@ -1646,3 +1646,27 @@ export function formatRelativeDate(dateStr: string): string {
     return 'Recently';
   }
 }
+
+/**
+ * Determine experience/seniority level for a job
+ */
+export function getJobExperienceLevel(job: Job): 'Junior' | 'Intermediate' | 'Senior' | 'Lead' {
+  if (job.experienceLevel) {
+    const l = String(job.experienceLevel).toLowerCase();
+    if (l.includes('junior') || l.includes('entry') || l.includes('intern')) return 'Junior';
+    if (l.includes('lead') || l.includes('staff') || l.includes('principal') || l.includes('architect')) return 'Lead';
+    if (l.includes('senior') || l.includes('sr')) return 'Senior';
+    if (l.includes('intermediate') || l.includes('mid')) return 'Intermediate';
+  }
+
+  const tagsStr = Array.isArray(job.tags) ? job.tags.join(' ') : '';
+  const text = `${job.title || ''} ${tagsStr} ${(job.description || '').slice(0, 400)}`.toLowerCase();
+
+  if (/\b(lead|staff|principal|director|head of|vp|architect)\b/i.test(job.title || '')) return 'Lead';
+  if (/\b(senior|sr\.?|5\+\s*years|7\+\s*years)\b/i.test(job.title || '')) return 'Senior';
+  if (/\b(junior|jr\.?|entry|associate|intern|graduate|0-2\s*years)\b/i.test(job.title || '')) return 'Junior';
+  if (/\b(mid|intermediate|2-5\s*years)\b/i.test(job.title || '')) return 'Intermediate';
+  if (/\b(senior|sr\.?)\b/i.test(text)) return 'Senior';
+  if (/\b(junior|entry)\b/i.test(text)) return 'Junior';
+  return 'Intermediate';
+}

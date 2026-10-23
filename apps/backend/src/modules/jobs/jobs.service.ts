@@ -142,6 +142,21 @@ export class JobsService {
         if (job.featured !== featured) return false;
       }
 
+      if (params.experienceLevel && params.experienceLevel !== 'all') {
+        const targetLvl = params.experienceLevel.toLowerCase();
+        let detected = (job.experienceLevel || '').toLowerCase();
+        if (!detected) {
+          if (/\b(lead|staff|principal|architect)\b/i.test(job.title)) detected = 'lead';
+          else if (/\b(senior|sr\.?)\b/i.test(job.title)) detected = 'senior';
+          else if (/\b(junior|jr\.?|entry|intern)\b/i.test(job.title)) detected = 'junior';
+          else detected = 'intermediate';
+        }
+        if (targetLvl === 'junior' && detected !== 'junior') return false;
+        if (targetLvl === 'intermediate' && detected !== 'intermediate') return false;
+        if (targetLvl === 'senior' && detected !== 'senior') return false;
+        if (targetLvl === 'lead' && detected !== 'lead') return false;
+      }
+
       if (search && search.trim()) {
         const query = search.trim().toLowerCase();
         const matchesTitle = job.title.toLowerCase().includes(query);
@@ -233,6 +248,7 @@ export class JobsService {
       company_logo: data.company_logo || undefined,
       category: data.category,
       specialization: data.specialization || data.category,
+      experienceLevel: data.experienceLevel || 'intermediate',
       job_type: data.job_type,
       candidate_required_location: data.candidate_required_location,
       salary: data.salary,

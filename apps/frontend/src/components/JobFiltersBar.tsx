@@ -17,7 +17,8 @@ import {
   Smartphone,
   ShieldCheck,
   BarChart3,
-  Rocket
+  Rocket,
+  Award
 } from 'lucide-react';
 
 interface JobFiltersBarProps {
@@ -51,6 +52,7 @@ export const JobFiltersBar: React.FC<JobFiltersBarProps> = ({
   const isFiltered =
     Boolean(filters.search) ||
     filters.category !== 'all' ||
+    (Boolean(filters.experienceLevel) && filters.experienceLevel !== 'all') ||
     filters.jobType !== 'all' ||
     filters.location !== 'all' ||
     (Boolean(filters.source) && filters.source !== 'all') ||
@@ -212,6 +214,23 @@ export const JobFiltersBar: React.FC<JobFiltersBarProps> = ({
               <option value="jobicy">🎯 Jobicy Tech Portal</option>
               <option value="remoteok">💻 RemoteOK Network</option>
               <option value="arbeitnow">🇪🇺 Arbeitnow Tech Feed</option>
+            </select>
+          </div>
+
+          {/* Experience Level dropdown */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-50 border border-neutral-200/80 text-neutral-700">
+            <Award className="w-3.5 h-3.5 text-amber-600" />
+            <select
+              id="filter-experience-level"
+              value={filters.experienceLevel || 'all'}
+              onChange={(e) => onChange({ experienceLevel: e.target.value })}
+              className="bg-transparent text-neutral-800 font-semibold focus:outline-none cursor-pointer"
+            >
+              <option value="all">All Seniority Levels</option>
+              <option value="junior">🌱 Junior / Entry (0-2 yrs)</option>
+              <option value="intermediate">🚀 Intermediate / Mid (2-5 yrs)</option>
+              <option value="senior">⚡ Senior Engineer (5+ yrs)</option>
+              <option value="lead">👑 Staff / Lead / Principal</option>
             </select>
           </div>
 

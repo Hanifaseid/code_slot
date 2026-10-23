@@ -112,6 +112,13 @@ resumeRouter.post(
 );
 
 resumeRouter.post(
+  '/bullet-enhance',
+  optionalAuth,
+  validateRequest({ body: AIBulletEnhanceRequestSchema }),
+  resumeController.enhanceBullet
+);
+
+resumeRouter.post(
   '/save',
   requireAuth,
   validateRequest({ body: SaveResumeRequestSchema }),
