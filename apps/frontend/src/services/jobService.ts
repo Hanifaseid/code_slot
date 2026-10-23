@@ -1053,27 +1053,15 @@ function normalizeArbeitnowJob(raw: any, index: number): Job {
 }
 
 /**
- * Live fetcher for WeWorkRemotely tech feeds (Full Stack, Backend, DevOps) via RSS2JSON API
+ * Live fetcher for WeWorkRemotely tech feeds (proxied via CodeSlot backend to prevent browser CORS blocks)
  */
-async function fetchWeWorkRemotelyJobs(timestamp?: number): Promise<Job[]> {
-  const feeds = [
-    { url: 'https://weworkremotely.com/categories/remote-full-stack-programming-jobs.rss', defaultSpec: 'Full Stack' },
-    { url: 'https://weworkremotely.com/categories/remote-back-end-programming-jobs.rss', defaultSpec: 'Backend' },
-    { url: 'https://weworkremotely.com/categories/remote-devops-sysadmin-jobs.rss', defaultSpec: 'DevOps / Cloud' }
-  ];
-
+async function fetchWeWorkRemotelyJobs(): Promise<Job[]> {
   const jobs: Job[] = [];
 
-  for (const feed of feeds) {
-    try {
-      const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`, {
-        cache: timestamp ? 'no-store' : 'default'
-      });
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (!Array.isArray(data.items)) continue;
-
-      data.items.forEach((item: any, idx: number) => {
+  try {
+    const res = await apiClient.get<any[]>('/jobs/external/weworkremotely');
+    if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+      res.data.forEach((item: any, idx: number) => {
         let rawTitle = String(item.title || 'Software Engineer');
         let companyName = 'WeWorkRemotely Partner';
 
@@ -1083,7 +1071,7 @@ async function fetchWeWorkRemotelyJobs(timestamp?: number): Promise<Job[]> {
           rawTitle = parts.slice(1).join(':').trim() || rawTitle;
         }
 
-        const tags = [feed.defaultSpec, 'Remote', 'Tech'];
+        const tags = ['Full Stack', 'Remote', 'Tech'];
         const spec = detectSpecialization(rawTitle, tags, item.description || '');
 
         jobs.push({
@@ -1100,12 +1088,13 @@ async function fetchWeWorkRemotelyJobs(timestamp?: number): Promise<Job[]> {
           url: item.link || 'https://weworkremotely.com',
           tags: Array.from(new Set([spec, ...tags])).slice(0, 6),
           source: 'WeWorkRemotely Global',
-          featured: false
+          featured: false,
         });
       });
-    } catch {
-      // Continue
+      return jobs;
     }
+  } catch {
+    // Graceful fallback
   }
 
   return jobs;

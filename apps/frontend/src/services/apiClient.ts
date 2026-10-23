@@ -2,19 +2,49 @@
  * Unified API Client for communicating with the CodeSlot Express Backend
  */
 
-const getApiBaseUrl = (): string => {
-  try {
-    const envUrl = import.meta.env.VITE_API_URL;
-    if (envUrl && typeof envUrl === 'string' && envUrl.trim().length > 0) {
-      return envUrl.trim().replace(/\/$/, '');
+export const getActiveApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+
+    // When running on any deployed origin (e.g. *.vercel.app, codeslot-nine.vercel.app, or custom domain):
+    if (!isLocalhost) {
+      try {
+        const envUrl = (import.meta.env.VITE_API_URL as string | undefined)?.trim();
+        // Only use external URL if it is an explicit HTTPS remote service (never localhost)
+        if (
+          envUrl &&
+          envUrl.startsWith('https://') &&
+          !envUrl.includes('localhost') &&
+          !envUrl.includes('127.0.0.1')
+        ) {
+          return envUrl.replace(/\/$/, '');
+        }
+      } catch {
+        // ignore
+      }
+      // On deployed origins, ALWAYS default to same-origin '/api' (handled by Vercel serverless /api/index.ts)
+      return '/api';
     }
-  } catch {
-    // ignore
+
+    // On localhost local development:
+    try {
+      const envUrl = (import.meta.env.VITE_API_URL as string | undefined)?.trim();
+      if (envUrl && envUrl.length > 0) {
+        return envUrl.replace(/\/$/, '');
+      }
+    } catch {
+      // ignore
+    }
+
+    // Default to '/api' which Vite proxies to http://localhost:5000
+    return '/api';
   }
+
   return '/api';
 };
 
-export const API_BASE_URL = getApiBaseUrl();
+export const API_BASE_URL = getActiveApiBaseUrl();
 
 /**
  * Get active auth token from localStorage
@@ -65,9 +95,24 @@ async function request<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<{ success: boolean; data?: T; error?: string }> {
-  const url = endpoint.startsWith('http')
-    ? endpoint
-    : `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  let url = endpoint;
+
+  if (!endpoint.startsWith('http')) {
+    const baseUrl = getActiveApiBaseUrl();
+    url = `${baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  } else if (
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1' &&
+    (endpoint.includes('localhost:5000') || endpoint.includes('127.0.0.1:5000'))
+  ) {
+    // Automatic safeguard for deployed environments (e.g. Vercel):
+    // Rewrite any hardcoded localhost:5000 requests to same-origin relative /api
+    url = endpoint.replace(/^http:\/\/(localhost|127\.0\.0\.1):5000/, '');
+    if (!url.startsWith('/api')) {
+      url = `/api${url.startsWith('/') ? '' : '/'}${url}`;
+    }
+  }
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

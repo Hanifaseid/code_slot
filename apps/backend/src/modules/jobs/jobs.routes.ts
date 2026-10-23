@@ -134,6 +134,35 @@ jobsRouter.get('/external/workingnomads', async (_req, res) => {
   }
 });
 
+jobsRouter.get('/external/weworkremotely', async (_req, res) => {
+  try {
+    const feeds = [
+      'https://weworkremotely.com/categories/remote-full-stack-programming-jobs.rss',
+      'https://weworkremotely.com/categories/remote-back-end-programming-jobs.rss',
+      'https://weworkremotely.com/categories/remote-devops-sysadmin-jobs.rss',
+    ];
+    const allItems: any[] = [];
+    for (const feedUrl of feeds) {
+      try {
+        const response = await fetch(
+          `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`
+        );
+        if (response.ok) {
+          const json = (await response.json()) as any;
+          if (Array.isArray(json?.items)) {
+            allItems.push(...json.items);
+          }
+        }
+      } catch {
+        // continue
+      }
+    }
+    return res.json({ success: true, data: allItems });
+  } catch {
+    return res.json({ success: true, data: [] });
+  }
+});
+
 jobsRouter.get('/:id', jobsController.getJobById);
 
 jobsRouter.post(

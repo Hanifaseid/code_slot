@@ -14,18 +14,58 @@ export function createApp(): Express {
   // Security Middleware
   app.use(
     helmet({
-      contentSecurityPolicy: config.isProduction ? undefined : false,
+      contentSecurityPolicy: false,
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      crossOriginOpenerPolicy: false,
     })
   );
 
-  // CORS Configuration
-  app.use(
-    cors({
-      origin: config.server.corsOrigin === '*' ? '*' : [config.server.corsOrigin, 'http://localhost:3000'],
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    })
-  );
+  // CORS Configuration - Permissive for seamless operation on localhost and Vercel
+  const corsOptions: cors.CorsOptions = {
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+
+      // Allow any localhost / 127.0.0.1 port
+      if (
+        origin.startsWith('http://localhost:') ||
+        origin.startsWith('https://localhost:') ||
+        origin.startsWith('http://127.0.0.1:') ||
+        origin.startsWith('https://127.0.0.1:')
+      ) {
+        return callback(null, true);
+      }
+
+      // Allow any Vercel domain (*.vercel.app)
+      if (origin.endsWith('.vercel.app') || origin === 'https://codeslot-nine.vercel.app') {
+        return callback(null, true);
+      }
+
+      // Allow configured CORS origin
+      if (
+        config.server.corsOrigin === '*' ||
+        origin === config.server.corsOrigin
+      ) {
+        return callback(null, true);
+      }
+
+      // Allow all origins in production deployment
+      return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+    ],
+    exposedHeaders: ['Authorization'],
+  };
+
+  app.use(cors(corsOptions));
+  app.options('*', cors(corsOptions));
 
   // Body Parsing Middleware
   app.use(express.json());
@@ -40,8 +80,12 @@ export function createApp(): Express {
   // Root Liveness Healthcheck (for container engines / Docker Compose)
   app.use('/health', healthRouter);
 
-  // API Routes
+  // API Routes - mounted on both config.server.apiPrefix ('/api') and root ('/')
+  // to ensure routes match whether invoked directly or rewritten by Vercel serverless
   app.use(config.server.apiPrefix, apiRouter);
+  if (config.server.apiPrefix !== '/') {
+    app.use('/', apiRouter);
+  }
 
   // 404 Catch-All Handler
   app.use((_req, _res, next) => {
