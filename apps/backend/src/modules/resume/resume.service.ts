@@ -29,40 +29,7 @@ interface StoredResume {
 const userResumesMap: Map<string, StoredResume[]> = new Map();
 
 // In-memory AI sessions list for admin tracking
-export const aiSessionsList: AIStudioSessionRecord[] = [
-  {
-    id: 'ai-sess-01',
-    userId: 'usr-alex-02',
-    userName: 'Alex Mercer',
-    userEmail: 'alex.mercer@codeslot.dev',
-    targetJob: 'Staff Frontend Engineer - Desktop & Web Core',
-    company: 'Linear',
-    initialAtsScore: 68,
-    tailoredAtsScore: 94,
-    improvement: 26,
-    bulletPointsGenerated: 8,
-    keywordsAdded: ['React', 'TypeScript', 'WASM', 'WebSockets', 'CRDT', 'Electron'],
-    latencyMs: 1420,
-    tokensUsed: 1850,
-    timestamp: '2026-09-21T11:45:00Z',
-  },
-  {
-    id: 'ai-sess-02',
-    userId: 'usr-alex-02',
-    userName: 'Alex Mercer',
-    userEmail: 'alex.mercer@codeslot.dev',
-    targetJob: 'Senior Backend Systems Engineer',
-    company: 'Stripe',
-    initialAtsScore: 72,
-    tailoredAtsScore: 96,
-    improvement: 24,
-    bulletPointsGenerated: 10,
-    keywordsAdded: ['Go', 'Distributed Systems', 'Kubernetes', 'PostgreSQL', 'Raft'],
-    latencyMs: 1610,
-    tokensUsed: 2120,
-    timestamp: '2026-09-20T16:15:00Z',
-  },
-];
+export const aiSessionsList: AIStudioSessionRecord[] = [];
 
 export class ResumeService {
   /**

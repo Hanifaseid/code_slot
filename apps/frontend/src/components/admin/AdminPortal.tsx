@@ -58,7 +58,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [isLiveSimulationActive, setIsLiveSimulationActive] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Core Data States
@@ -70,17 +69,22 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [auditLogs, setAuditLogs] = useState<AdminAuditEntry[]>(() => adminService.getAuditLogs());
   const [jobs, setJobs] = useState<Job[]>([]);
 
+  const handleRefreshTelemetry = async () => {
+    await adminService.syncFromBackend();
+    setUsers(adminService.getUsers());
+    setActivities(adminService.getActivities());
+    setApplications(adminService.getApplications());
+    setAiSessions(adminService.getAISessions());
+    setAuditLogs(adminService.getAuditLogs());
+    setStats(adminService.getStats());
+  };
+
   // Load jobs and sync admin state from backend
   useEffect(() => {
     fetchRealJobs().then((j: Job[]) => setJobs(j));
-    adminService.syncFromBackend().then(() => {
-      setUsers(adminService.getUsers());
-      setActivities(adminService.getActivities());
-      setApplications(adminService.getApplications());
-      setAiSessions(adminService.getAISessions());
-      setAuditLogs(adminService.getAuditLogs());
-      setStats(adminService.getStats());
-    });
+    handleRefreshTelemetry();
+    const interval = setInterval(handleRefreshTelemetry, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   // Show temporary toast feedback
@@ -89,27 +93,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     setTimeout(() => {
       setToastMessage(null);
     }, 3500);
-  };
-
-  // Real-time Activity Simulator loop
-  useEffect(() => {
-    if (!isLiveSimulationActive) return;
-
-    const interval = setInterval(() => {
-      const newEvent = adminService.generateSimulatedEvent();
-      setActivities(adminService.getActivities());
-      setStats(adminService.getStats());
-    }, 7000); // add a new realistic user event every 7 seconds
-
-    return () => clearInterval(interval);
-  }, [isLiveSimulationActive]);
-
-  // Handlers
-  const handleSimulateSingleEvent = () => {
-    const newEvent = adminService.generateSimulatedEvent();
-    setActivities(adminService.getActivities());
-    setStats(adminService.getStats());
-    showToast(`Live event generated: ${newEvent.userName} · ${newEvent.action}`);
   };
 
   const handleUpdateUserStatus = (userId: string, status: UserStatus) => {
@@ -131,29 +114,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     showToast(`Exported ${dataType}.csv report successfully`);
   };
 
-  const handleTriggerTrafficSpike = () => {
-    for (let i = 0; i < 5; i++) {
-      adminService.generateSimulatedEvent();
-    }
-    setActivities(adminService.getActivities());
-    setStats(adminService.getStats());
-    showToast('Simulated high-traffic surge with 5 simultaneous candidate events');
-  };
-
-  const handleClearCache = () => {
+  const handleClearCache = async () => {
     localStorage.removeItem('codeslot_admin_activities');
     localStorage.removeItem('codeslot_admin_users');
     localStorage.removeItem('codeslot_admin_applications');
     localStorage.removeItem('codeslot_admin_ai_sessions');
     localStorage.removeItem('codeslot_admin_audit');
 
-    setUsers(adminService.getUsers());
-    setActivities(adminService.getActivities());
-    setApplications(adminService.getApplications());
-    setAiSessions(adminService.getAISessions());
-    setAuditLogs(adminService.getAuditLogs());
-    setStats(adminService.getStats());
-    showToast('Admin telemetry cache reset to realistic baseline');
+    await handleRefreshTelemetry();
+    showToast('Admin telemetry cache reset and synced from backend');
   };
 
   const handleImpersonate = (managedUser: ManagedUser) => {
@@ -202,7 +171,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <span className="font-logo text-xl font-extrabold tracking-tight text-neutral-950">
-                  CODESLOT
+                  CODE<span className="text-orange-500">SLOT</span>
                 </span>
                 <span className="px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-900 font-mono text-[10px] font-extrabold tracking-wide uppercase border border-amber-500/25">
                   ADMIN OS
@@ -385,24 +354,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           {/* Quick Header Actions */}
           <div className="flex items-center gap-3">
             <button
-              onClick={() => setIsLiveSimulationActive(!isLiveSimulationActive)}
-              className={`hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
-                isLiveSimulationActive
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                  : 'bg-neutral-100 text-neutral-600'
-              }`}
+              onClick={handleRefreshTelemetry}
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 transition-all cursor-pointer hover:bg-emerald-100"
             >
-              <span
-                className={`w-2 h-2 rounded-full ${isLiveSimulationActive ? 'bg-emerald-500 animate-ping' : 'bg-neutral-400'}`}
-              />
-              <span>{isLiveSimulationActive ? 'Live Telemetry Ticker Active' : 'Ticker Paused'}</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+              <span>Live Backend Telemetry Active</span>
             </button>
 
             <button
               onClick={onNavigateToJobs}
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs transition-colors cursor-pointer"
             >
-              <Briefcase className="w-3.5 h-3.5" />
+              <Briefcase className="w-3.5 h-3.5 text-orange-500" />
               <span>Jobs Board</span>
             </button>
 
@@ -426,7 +389,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 users={users}
                 applications={applications}
                 onNavigateTab={(tab) => setActiveTab(tab)}
-                onSimulateEvent={handleSimulateSingleEvent}
+                onRefreshTelemetry={handleRefreshTelemetry}
                 onExportCSV={handleExportCSV}
               />
             )}
@@ -434,9 +397,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             {activeTab === 'activities' && (
               <AdminActivitiesView
                 activities={activities}
-                isLiveSimulationActive={isLiveSimulationActive}
-                onToggleSimulation={() => setIsLiveSimulationActive(!isLiveSimulationActive)}
-                onSimulateEvent={handleSimulateSingleEvent}
+                onRefreshFeed={handleRefreshTelemetry}
                 onExportCSV={() => handleExportCSV('activities')}
               />
             )}
@@ -477,8 +438,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             {activeTab === 'system' && (
               <AdminSystemView
                 auditLogs={auditLogs}
-                onTriggerTrafficSpike={handleTriggerTrafficSpike}
                 onClearCache={handleClearCache}
+                onRefreshTelemetry={handleRefreshTelemetry}
               />
             )}
           </div>

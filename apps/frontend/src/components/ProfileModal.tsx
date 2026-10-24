@@ -15,6 +15,10 @@ import {
   Send,
   Sparkles,
   ShieldCheck,
+  ImageIcon,
+  Upload,
+  Trash2,
+  ExternalLink,
 } from 'lucide-react';
 import { UserSession } from '../types';
 import { apiClient } from '../services/apiClient';
@@ -41,6 +45,9 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [githubUrl, setGithubUrl] = useState('');
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [portfolioUrl, setPortfolioUrl] = useState('');
+  const [portfolioImage, setPortfolioImage] = useState('');
+  const [portfolioProjectTitle, setPortfolioProjectTitle] = useState('');
+  const [imageInputTab, setImageInputTab] = useState<'upload' | 'url'>('upload');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -49,6 +56,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     if (!isOpen || !currentUser) return;
     setFeedback(null);
     setName(currentUser.name || '');
+    setPortfolioImage(currentUser.portfolioImage || '');
+    setPortfolioProjectTitle(currentUser.portfolioProjectTitle || '');
 
     // Fetch fresh profile from backend
     setIsLoading(true);
@@ -66,6 +75,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           setGithubUrl(u.githubUrl || '');
           setLinkedinUrl(u.linkedinUrl || '');
           setPortfolioUrl(u.portfolioUrl || '');
+          setPortfolioImage(u.portfolioImage || currentUser.portfolioImage || '');
+          setPortfolioProjectTitle(u.portfolioProjectTitle || currentUser.portfolioProjectTitle || '');
         }
       })
       .finally(() => {
@@ -74,6 +85,23 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   }, [isOpen, currentUser]);
 
   if (!isOpen || !currentUser) return null;
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setFeedback({ type: 'error', message: 'Image must be smaller than 5MB.' });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setPortfolioImage(reader.result);
+        setFeedback({ type: 'success', message: 'Portfolio image loaded. Remember to click "Save Profile" below.' });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,6 +124,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         githubUrl,
         linkedinUrl,
         portfolioUrl,
+        portfolioImage,
+        portfolioProjectTitle,
       });
 
       if (res.success && res.data?.user) {
@@ -106,6 +136,9 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           title: u.title,
           location: u.location,
           experienceLevel: u.experienceLevel || experienceLevel,
+          portfolioUrl: u.portfolioUrl || portfolioUrl,
+          portfolioImage: u.portfolioImage !== undefined ? u.portfolioImage : portfolioImage,
+          portfolioProjectTitle: u.portfolioProjectTitle !== undefined ? u.portfolioProjectTitle : portfolioProjectTitle,
           savedJobIds: u.savedJobIds || currentUser.savedJobIds || [],
           appliedJobIds: u.appliedJobIds || currentUser.appliedJobIds || [],
         };
@@ -117,7 +150,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         }
 
         onProfileUpdated(nextSession);
-        setFeedback({ type: 'success', message: 'Profile updated and synced with cloud database.' });
+        setFeedback({ type: 'success', message: 'Profile & Portfolio image updated successfully.' });
         setTimeout(() => {
           onClose();
         }, 1200);
@@ -145,7 +178,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             </div>
             <div>
               <h2 className="text-base font-extrabold text-neutral-900 flex items-center gap-2">
-                <span>Developer Profile</span>
+                <span>Developer <span className="text-orange-500 font-extrabold">P</span>rofile</span>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
                   {currentUser.role === 'admin' ? 'Super Admin' : 'Verified Candidate'}
                 </span>
@@ -343,6 +376,126 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Portfolio Showcase Image & Project */}
+              <div className="space-y-3 pt-3 border-t border-neutral-200/70">
+                <div className="flex items-center justify-between">
+                  <div className="text-[11px] font-bold text-neutral-800 uppercase tracking-wider flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-orange-500" />
+                    <span>Portfolio <span className="text-orange-500 font-extrabold">S</span>howcase & <span className="text-orange-500 font-extrabold">W</span>ork Sample</span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-orange-700 bg-orange-50 border border-orange-200/80 px-2 py-0.5 rounded-full">
+                    Recruiter Visible
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-neutral-700">
+                    Project / Artifact Title
+                  </label>
+                  <input
+                    type="text"
+                    value={portfolioProjectTitle}
+                    placeholder="e.g. Distributed Analytics Engine or SaaS Dashboard"
+                    onChange={(e) => setPortfolioProjectTitle(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-900 text-xs font-medium focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+
+                {/* Input Method Toggle */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setImageInputTab('upload')}
+                      className={`px-3 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer ${
+                        imageInputTab === 'upload'
+                          ? 'bg-orange-500 text-white border-orange-600 shadow-xs'
+                          : 'bg-neutral-100 text-neutral-600 border-neutral-200 hover:bg-neutral-200'
+                      }`}
+                    >
+                      <Upload className="w-3 h-3 inline mr-1" />
+                      Upload Image File
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageInputTab('url')}
+                      className={`px-3 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer ${
+                        imageInputTab === 'url'
+                          ? 'bg-orange-500 text-white border-orange-600 shadow-xs'
+                          : 'bg-neutral-100 text-neutral-600 border-neutral-200 hover:bg-neutral-200'
+                      }`}
+                    >
+                      <Globe className="w-3 h-3 inline mr-1" />
+                      Image URL
+                    </button>
+                  </div>
+
+                  {imageInputTab === 'upload' ? (
+                    <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-orange-200 hover:border-orange-400 bg-orange-50/30 hover:bg-orange-50/60 rounded-2xl cursor-pointer transition-all">
+                      <Upload className="w-6 h-6 text-orange-500 mb-1" />
+                      <span className="text-xs font-semibold text-neutral-800">
+                        Click to upload portfolio image or screenshot
+                      </span>
+                      <span className="text-[10px] text-neutral-500 mt-0.5">
+                        PNG, JPG, SVG, WebP up to 5MB
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  ) : (
+                    <div className="relative">
+                      <Globe className="w-3.5 h-3.5 absolute left-3 top-3 text-neutral-400" />
+                      <input
+                        type="url"
+                        value={portfolioImage}
+                        placeholder="https://images.unsplash.com/... or hosted screenshot URL"
+                        onChange={(e) => setPortfolioImage(e.target.value)}
+                        className="w-full pl-9 pr-3 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-900 text-xs font-medium focus:outline-none focus:border-orange-500"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Image Preview if available */}
+                {portfolioImage && (
+                  <div className="relative p-2.5 rounded-2xl border border-orange-200 bg-orange-50/30 flex items-start gap-3">
+                    <img
+                      src={portfolioImage}
+                      alt="Portfolio Preview"
+                      className="w-24 h-20 object-cover rounded-xl border border-orange-300 shadow-xs shrink-0 bg-white"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80';
+                      }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-neutral-900 text-xs truncate">
+                        {portfolioProjectTitle || 'Untitled Portfolio Showcase'}
+                      </div>
+                      <div className="text-[10px] text-neutral-500 truncate mt-0.5">
+                        {portfolioImage.startsWith('data:') ? 'Local file uploaded (base64 embedded)' : portfolioImage}
+                      </div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPortfolioImage('');
+                            setPortfolioProjectTitle('');
+                          }}
+                          className="px-2.5 py-1 text-[10px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Stats badges */}

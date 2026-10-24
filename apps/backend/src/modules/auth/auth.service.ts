@@ -28,6 +28,8 @@ interface InternalUserRecord {
   githubUrl?: string;
   linkedinUrl?: string;
   portfolioUrl?: string;
+  portfolioImage?: string;
+  portfolioProjectTitle?: string;
   savedJobIds: string[];
   appliedJobIds: string[];
   resumeScore: number;
@@ -58,27 +60,81 @@ const inMemoryUsers: Map<string, InternalUserRecord> = new Map([
     },
   ],
   [
-    'alex.mercer@codeslot.dev',
+    'sarah.chen@techmail.io',
     {
-      id: 'usr-alex-02',
-      email: 'alex.mercer@codeslot.dev',
-      passwordHash: hashPassword('alex1122'),
-      name: 'Alex Mercer',
-      title: 'Senior Distributed Systems Engineer',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+      id: 'usr-sarah-03',
+      email: 'sarah.chen@techmail.io',
+      passwordHash: hashPassword('sarah1122'),
+      name: 'Sarah Chen',
+      title: 'Staff Frontend Architect',
+      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150',
+      role: 'candidate',
+      status: 'verified',
+      plan: 'Enterprise',
+      location: 'Seattle, WA (Remote)',
+      skills: ['React', 'TypeScript', 'Next.js', 'Web Performance', 'GraphQL', 'Tailwind'],
+      specialization: 'Frontend',
+      githubUrl: 'https://github.com/sarahchen',
+      linkedinUrl: 'https://linkedin.com/in/sarahchen',
+      portfolioUrl: 'https://sarahchen.design',
+      portfolioImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80',
+      portfolioProjectTitle: 'Real-Time Design System & Canvas Engine',
+      savedJobIds: ['cs-linear-staff-eng'],
+      appliedJobIds: ['cs-linear-staff-eng'],
+      resumeScore: 96,
+      createdAt: '2026-01-20T11:15:00.000Z',
+    },
+  ],
+  [
+    'elena.rostova@ai-research.org',
+    {
+      id: 'usr-elena-04',
+      email: 'elena.rostova@ai-research.org',
+      passwordHash: hashPassword('elena1122'),
+      name: 'Elena Rostova',
+      title: 'Principal Machine Learning Scientist',
+      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
+      role: 'candidate',
+      status: 'verified',
+      plan: 'Enterprise',
+      location: 'Zurich, Switzerland (Remote)',
+      skills: ['PyTorch', 'Transformers', 'LLM Fine-tuning', 'Python', 'CUDA', 'vLLM'],
+      specialization: 'AI & Machine Learning',
+      githubUrl: 'https://github.com/elena-rostova',
+      linkedinUrl: 'https://linkedin.com/in/elenarostova',
+      portfolioUrl: 'https://elena-ai.org',
+      portfolioImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+      portfolioProjectTitle: 'Low-Latency Neural Inferencing Accelerator',
+      savedJobIds: ['cs-openai-research-eng'],
+      appliedJobIds: ['cs-openai-research-eng'],
+      resumeScore: 98,
+      createdAt: '2026-02-10T16:20:00.000Z',
+    },
+  ],
+  [
+    'david.okafor@cloudengine.dev',
+    {
+      id: 'usr-david-05',
+      email: 'david.okafor@cloudengine.dev',
+      passwordHash: hashPassword('david1122'),
+      name: 'David Okafor',
+      title: 'Lead Platform / Cloud Engineer',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
       role: 'candidate',
       status: 'active',
       plan: 'Pro Dev',
       location: 'Austin, TX (Remote)',
-      skills: ['Go', 'TypeScript', 'Distributed Systems', 'PostgreSQL', 'Docker', 'React'],
-      specialization: 'Backend',
-      githubUrl: 'https://github.com/alex-mercer',
-      linkedinUrl: 'https://linkedin.com/in/alexmercer',
-      portfolioUrl: 'https://alexmercer.dev',
-      savedJobIds: ['cs-linear-staff-eng', 'cs-stripe-backend-infra'],
-      appliedJobIds: ['cs-automattic-fullstack-core'],
-      resumeScore: 92,
-      createdAt: '2026-02-15T12:00:00.000Z',
+      skills: ['AWS', 'Terraform', 'Kubernetes', 'CI/CD', 'Docker', 'Prometheus'],
+      specialization: 'DevOps / Cloud',
+      githubUrl: 'https://github.com/david-okafor',
+      linkedinUrl: 'https://linkedin.com/in/davidokafor',
+      portfolioUrl: 'https://davidokafor.cloud',
+      portfolioImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop&q=80',
+      portfolioProjectTitle: 'Multi-Region Kubernetes Fleet Manager',
+      savedJobIds: ['cs-stripe-backend-infra'],
+      appliedJobIds: [],
+      resumeScore: 89,
+      createdAt: '2026-02-01T14:45:00.000Z',
     },
   ],
 ]);
@@ -100,6 +156,8 @@ function toUserProfile(user: InternalUserRecord): UserProfile {
     githubUrl: user.githubUrl,
     linkedinUrl: user.linkedinUrl,
     portfolioUrl: user.portfolioUrl,
+    portfolioImage: user.portfolioImage,
+    portfolioProjectTitle: user.portfolioProjectTitle,
     savedJobIds: user.savedJobIds,
     appliedJobIds: user.appliedJobIds,
     createdAt: user.createdAt,
@@ -262,17 +320,6 @@ export class AuthService {
       }
     }
 
-    // Special check for demo admin
-    if (normalizedEmail === 'admin@gmail.com' && data.password === 'admin1122') {
-      const adminUser = inMemoryUsers.get('admin@gmail.com')!;
-      const token = signToken({
-        userId: adminUser.id,
-        email: adminUser.email,
-        role: adminUser.role,
-      });
-      return { user: toUserProfile(adminUser), token };
-    }
-
     if (!user) {
       throw new BadRequestError('Invalid email or password', 'INVALID_CREDENTIALS');
     }
@@ -280,28 +327,6 @@ export class AuthService {
     const isValid = verifyPassword(data.password, user.passwordHash);
     if (!isValid) {
       throw new BadRequestError('Invalid email or password', 'INVALID_CREDENTIALS');
-    }
-
-    const token = signToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
-    return {
-      user: toUserProfile(user),
-      token,
-    };
-  }
-
-  /**
-   * Instant demo authentication (candidate or admin)
-   */
-  async demoLogin(role: 'admin' | 'candidate' | 'recruiter' = 'candidate'): Promise<AuthResponse> {
-    const email = role === 'admin' ? 'admin@gmail.com' : 'alex.mercer@codeslot.dev';
-    const user = inMemoryUsers.get(email);
-    if (!user) {
-      throw new NotFoundError('Demo user account not found');
     }
 
     const token = signToken({
@@ -405,6 +430,8 @@ export class AuthService {
         if (data.githubUrl !== undefined) user.githubUrl = data.githubUrl;
         if (data.linkedinUrl !== undefined) user.linkedinUrl = data.linkedinUrl;
         if (data.portfolioUrl !== undefined) user.portfolioUrl = data.portfolioUrl;
+        if ((data as any).portfolioImage !== undefined) user.portfolioImage = (data as any).portfolioImage;
+        if ((data as any).portfolioProjectTitle !== undefined) user.portfolioProjectTitle = (data as any).portfolioProjectTitle;
 
         inMemoryUsers.set(email, user);
         updatedRecord = user;

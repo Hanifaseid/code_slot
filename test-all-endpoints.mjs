@@ -59,16 +59,21 @@ async function startSuite() {
     return `Logged in as: ${json.data.user.name} (Role: ${json.data.user.role})`;
   });
 
-  await runTest('4. POST /api/auth/demo-login (Candidate Quick Demo Login)', async () => {
-    const res = await fetch(`${BASE_URL}/api/auth/demo-login`, {
+  await runTest('4. POST /api/auth/register (Candidate Account Registration)', async () => {
+    const res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: 'candidate' }),
+      body: JSON.stringify({
+        email: `candidate.verified.${Date.now()}@codeslot.dev`,
+        password: 'Password123!',
+        name: 'Jordan Sparks',
+        role: 'candidate',
+      }),
     });
     const json = await res.json();
-    if (!json.success || !json.data?.token) throw new Error(json.error?.message || 'Demo login failed');
+    if (!json.success || !json.data?.token) throw new Error(json.error?.message || 'Candidate register failed');
     candidateToken = json.data.token;
-    return `Logged in as: ${json.data.user.name} (Role: ${json.data.user.role})`;
+    return `Candidate created & authenticated: ${json.data.user.name} (Role: ${json.data.user.role})`;
   });
 
   const uniqueEmail = `test.dev.${Date.now()}@codeslot.dev`;

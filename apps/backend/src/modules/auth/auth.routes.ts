@@ -60,27 +60,6 @@ registry.registerPath({
 });
 
 registry.registerPath({
-  method: 'post',
-  path: '/api/auth/demo-login',
-  summary: 'Quick demo login without password',
-  request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: DemoLoginRequestSchema,
-        },
-      },
-    },
-  },
-  responses: {
-    200: {
-      description: 'Demo session started successfully',
-      content: { 'application/json': { schema: AuthDocSchema } },
-    },
-  },
-});
-
-registry.registerPath({
   method: 'get',
   path: '/api/auth/me',
   summary: 'Get current authenticated user profile',
@@ -102,12 +81,6 @@ authRouter.post(
   '/login',
   validateRequest({ body: LoginRequestSchema }),
   authController.login
-);
-
-authRouter.post(
-  '/demo-login',
-  validateRequest({ body: DemoLoginRequestSchema }),
-  authController.demoLogin
 );
 
 authRouter.get(

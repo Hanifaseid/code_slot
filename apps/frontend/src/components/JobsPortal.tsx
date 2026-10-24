@@ -414,7 +414,7 @@ export const JobsPortal: React.FC<JobsPortalProps> = ({
               className="font-logo text-xl sm:text-[22px] font-extrabold text-neutral-950 tracking-tight select-none hover:opacity-80 transition-opacity cursor-pointer"
               aria-label="CodeSlot Home"
             >
-              CODESLOT
+              CODE<span className="text-orange-500">SLOT</span>
             </button>
 
             <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
@@ -469,7 +469,7 @@ export const JobsPortal: React.FC<JobsPortalProps> = ({
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-neutral-200/70 pb-6 text-left">
           <div className="space-y-1.5">
             <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-neutral-950 font-normal tracking-tight">
-              Remote Tech Careers
+              Remote <span className="text-orange-500">T</span>ech Careers
             </h1>
             <p className="text-xs sm:text-sm text-neutral-600 max-w-3xl leading-relaxed">
               Aggregating 100% real engineering, frontend, backend, full stack, DevOps, and AI roles directly from Y Combinator, US tech startups, and global career feeds.

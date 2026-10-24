@@ -82,7 +82,7 @@ export const AdminJobsInventoryView: React.FC<AdminJobsInventoryViewProps> = ({ 
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">
-              Jobs Inventory & Feed Telemetry
+              Jobs <span className="text-orange-500 font-extrabold">I</span>nventory & <span className="text-orange-500 font-extrabold">F</span>eed <span className="text-orange-500 font-extrabold">T</span>elemetry
             </h1>
             <span className="px-2.5 py-0.5 rounded-full bg-neutral-900 text-white text-xs font-bold">
               {jobs.length} Verified Positions
@@ -95,7 +95,7 @@ export const AdminJobsInventoryView: React.FC<AdminJobsInventoryViewProps> = ({ 
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-neutral-950 font-bold text-xs transition-colors cursor-pointer"
         >
           <PlusCircle className="w-4 h-4" />
           <span>Publish Verified Listing</span>
@@ -129,13 +129,13 @@ export const AdminJobsInventoryView: React.FC<AdminJobsInventoryViewProps> = ({ 
       {/* Search and Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
         <div className="sm:col-span-8 relative">
-          <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-orange-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search verified jobs by title, company, or stack tags..."
-            className="w-full pl-9 pr-4 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-hidden focus:ring-1 focus:ring-neutral-900"
+            className="w-full pl-9 pr-4 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-hidden focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
           />
         </div>
 

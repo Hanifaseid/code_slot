@@ -5,14 +5,14 @@ import { ResumeData } from '../types/resume';
  */
 export const defaultResumeData: ResumeData = {
   personalInfo: {
-    fullName: 'Alex Vance',
+    fullName: 'Jordan Lee',
     jobTitle: 'Senior Full-Stack Software Engineer',
-    email: 'alex.vance@codeslot.dev',
+    email: 'jordan.lee@codeslot.dev',
     phone: '+1 (555) 234-8901',
     location: 'San Francisco, CA (Remote)',
-    website: 'https://alexvance.dev',
-    linkedin: 'linkedin.com/in/alexvance-dev',
-    github: 'github.com/alexvance',
+    website: 'https://jordanlee.dev',
+    linkedin: 'linkedin.com/in/jordanlee-dev',
+    github: 'github.com/jordanlee',
     summary:
       'Product-minded Senior Full-Stack Engineer with 7+ years of experience architecting high-throughput distributed systems, scalable web applications, and resilient cloud architectures. Proven track record of reducing latency by 45% and leading cross-functional teams from ideation to production. Specialized in TypeScript, React, Next.js, Node.js, and cloud-native microservices.'
   },

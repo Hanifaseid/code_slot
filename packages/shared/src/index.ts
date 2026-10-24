@@ -107,6 +107,8 @@ export const UserProfileSchema = z.object({
   githubUrl: z.string().optional(),
   linkedinUrl: z.string().optional(),
   portfolioUrl: z.string().optional(),
+  portfolioImage: z.string().optional(),
+  portfolioProjectTitle: z.string().optional(),
   savedJobIds: z.array(z.string()).default([]),
   appliedJobIds: z.array(z.string()).default([]),
   createdAt: z.string().optional(),
@@ -124,6 +126,8 @@ export const UpdateProfileRequestSchema = z.object({
   githubUrl: z.string().url().optional().or(z.literal('')),
   linkedinUrl: z.string().url().optional().or(z.literal('')),
   portfolioUrl: z.string().url().optional().or(z.literal('')),
+  portfolioImage: z.string().optional(),
+  portfolioProjectTitle: z.string().optional(),
 });
 export type UpdateProfileRequest = z.infer<typeof UpdateProfileRequestSchema>;
 
@@ -467,6 +471,8 @@ export const ManagedUserSchema = z.object({
   githubUrl: z.string().optional(),
   linkedinUrl: z.string().optional(),
   portfolioUrl: z.string().optional(),
+  portfolioImage: z.string().optional(),
+  portfolioProjectTitle: z.string().optional(),
 });
 export type ManagedUser = z.infer<typeof ManagedUserSchema>;
 

@@ -125,14 +125,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     setTimeout(() => {
       setIsLoading(false);
       const isAdmin = email.trim().toLowerCase() === 'admin@gmail.com';
-      if (isAdmin && password !== 'admin1122') {
-        setErrorMessage('Invalid password for demo admin. Please use "admin1122"');
-        return;
-      }
-
       const name = isAdmin ? 'Super Admin' : fullName.trim() || email.split('@')[0] || 'Developer';
       const userSession: UserSession = {
-        email: email.trim() || 'developer@codeslot.dev',
+        email: email.trim(),
         name,
         role: isAdmin ? 'admin' : 'candidate',
         savedJobIds: [],
@@ -179,7 +174,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               className="font-logo text-lg sm:text-xl font-extrabold text-neutral-950 tracking-tight select-none hover:opacity-80 transition-opacity cursor-pointer"
               aria-label="CodeSlot Home"
             >
-              CODESLOT
+              CODE<span className="text-orange-500">SLOT</span>
             </button>
           </div>
 

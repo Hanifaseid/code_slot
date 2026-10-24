@@ -19,31 +19,10 @@ const jobsMap: Map<string, Job> = new Map(
 );
 
 // Map of userId -> Set of saved jobId
-const userSavedJobsMap: Map<string, Set<string>> = new Map([
-  ['usr-alex-02', new Set(['cs-linear-staff-eng', 'cs-stripe-backend-infra'])],
-]);
+const userSavedJobsMap: Map<string, Set<string>> = new Map();
 
 // In-memory applications
-const applicationsList: JobApplication[] = [
-  {
-    id: 'app-init-01',
-    userId: 'usr-alex-02',
-    userName: 'Alex Mercer',
-    userEmail: 'alex.mercer@codeslot.dev',
-    userAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-    jobId: 'cs-automattic-fullstack-core',
-    jobTitle: 'Senior Full Stack Engineer - Gutenberg & Web Core',
-    company: 'Automattic',
-    companyLogo: 'https://www.google.com/s2/favicons?domain=automattic.com&sz=128',
-    stage: 'interview',
-    appliedAt: '2026-09-21T14:20:00Z',
-    matchScore: 94,
-    resumeVersion: 'FullStack v3 - AI Tailored',
-    sourceUrl: 'https://automattic.com/work-with-us',
-    salaryRange: '$145,000 - $185,000',
-    notes: 'Phone screen completed, technical architecture interview scheduled.',
-  },
-];
+const applicationsList: JobApplication[] = [];
 
 export class JobsService {
   /**

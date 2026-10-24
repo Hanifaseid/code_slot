@@ -18,7 +18,8 @@ import {
   Linkedin,
   UserCheck,
   UserX,
-  Eye
+  Eye,
+  Globe,
 } from 'lucide-react';
 import { ManagedUser, UserActivityEvent, JobApplicationRecord, UserStatus } from '../../types/admin';
 
@@ -113,7 +114,7 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">
-              User & Candidate Directory
+              <span className="text-orange-500 font-extrabold">U</span>ser & <span className="text-orange-500 font-extrabold">C</span>andidate <span className="text-orange-500 font-extrabold">D</span>irectory
             </h1>
             <span className="px-2.5 py-0.5 rounded-full bg-neutral-900 text-white text-xs font-bold">
               {users.length} Registered
@@ -129,7 +130,7 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({
             onClick={onExportCSV}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-medium text-xs transition-colors cursor-pointer"
           >
-            <Users className="w-3.5 h-3.5" />
+            <Users className="w-3.5 h-3.5 text-orange-400" />
             <span>Export User Directory CSV</span>
           </button>
         </div>
@@ -138,13 +139,13 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({
       {/* Search and Filters Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
         <div className="sm:col-span-6 relative">
-          <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-orange-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by developer name, email, title, or skills..."
-            className="w-full pl-9 pr-4 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-hidden focus:ring-1 focus:ring-neutral-900"
+            className="w-full pl-9 pr-4 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-hidden focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
           />
         </div>
 
@@ -400,6 +401,91 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({
                       </span>
                     ))}
                   </div>
+                </div>
+
+                {/* Professional Links */}
+                {(selectedUser.githubUrl || selectedUser.linkedinUrl || selectedUser.portfolioUrl) && (
+                  <div>
+                    <div className="text-neutral-500 font-bold uppercase text-[10px] tracking-wider mb-2">
+                      Professional Profiles & Links
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedUser.githubUrl && (
+                        <a
+                          href={selectedUser.githubUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold transition-colors"
+                        >
+                          <Github className="w-3.5 h-3.5" />
+                          <span>GitHub</span>
+                        </a>
+                      )}
+                      {selectedUser.linkedinUrl && (
+                        <a
+                          href={selectedUser.linkedinUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold transition-colors"
+                        >
+                          <Linkedin className="w-3.5 h-3.5" />
+                          <span>LinkedIn</span>
+                        </a>
+                      )}
+                      {selectedUser.portfolioUrl && (
+                        <a
+                          href={selectedUser.portfolioUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-50 hover:bg-orange-100 text-orange-700 text-xs font-semibold transition-colors"
+                        >
+                          <Globe className="w-3.5 h-3.5 text-orange-500" />
+                          <span>Portfolio Website</span>
+                          <ExternalLink className="w-3 h-3 text-orange-400" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Portfolio Showcase Card */}
+                <div className="p-4 rounded-2xl border border-orange-200/80 bg-gradient-to-br from-orange-50/40 via-amber-50/20 to-white space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-neutral-800 font-bold uppercase text-[10px] tracking-wider flex items-center gap-1.5">
+                      <ExternalLink className="w-3.5 h-3.5 text-orange-500" />
+                      <span>Portfolio <span className="text-orange-500 font-bold">S</span>howcase & <span className="text-orange-500 font-bold">W</span>ork Sample</span>
+                    </div>
+                    {selectedUser.portfolioUrl && (
+                      <a
+                        href={selectedUser.portfolioUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[11px] font-bold text-orange-600 hover:text-orange-700 hover:underline flex items-center gap-1"
+                      >
+                        Visit Portfolio
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
+
+                  {selectedUser.portfolioImage ? (
+                    <div className="space-y-2">
+                      <div className="font-bold text-neutral-900 text-xs">
+                        {selectedUser.portfolioProjectTitle || 'Featured Project Artifact'}
+                      </div>
+                      <div className="rounded-xl overflow-hidden border border-orange-200 shadow-xs max-h-56 bg-neutral-950 flex items-center justify-center">
+                        <img
+                          src={selectedUser.portfolioImage}
+                          alt={selectedUser.portfolioProjectTitle || 'Portfolio image'}
+                          className="w-full max-h-56 object-contain"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-4 text-center text-neutral-400 text-xs italic bg-white/70 rounded-xl border border-dashed border-neutral-200">
+                      No visual portfolio artifact uploaded yet by this candidate.
+                    </div>
+                  )}
                 </div>
 
                 {/* Status Switcher Actions */}

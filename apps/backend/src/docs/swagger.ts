@@ -18,7 +18,7 @@ registry.registerComponent('securitySchemes', 'bearerAuth', {
   type: 'http',
   scheme: 'bearer',
   bearerFormat: 'JWT',
-  description: 'Enter your JWT token obtained from /api/auth/login or /api/auth/demo-login',
+  description: 'Enter your JWT token obtained from /api/auth/login or /api/auth/register',
 });
 
 // Register Health schema

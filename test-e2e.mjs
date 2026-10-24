@@ -55,14 +55,18 @@ async function test() {
   const jobsData = await jobsRes.json();
   console.log('8. GET /api/jobs:', jobsRes.status, `Loaded jobs: ${jobsData.data?.jobs?.length}, total: ${jobsData.data?.total}`);
 
-  // 9. Candidate Demo Login
-  const demoRes = await fetch(`${BASE_URL}/api/auth/demo-login`, {
+  // 9. Candidate Register & Login
+  const candidateRes = await fetch(`${BASE_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ role: 'candidate' }),
+    body: JSON.stringify({
+      email: `candidate-${Date.now()}@codeslot.dev`,
+      password: 'password123',
+      name: 'Verified Candidate',
+    }),
   });
-  const demoData = await demoRes.json();
-  console.log('9. POST /api/auth/demo-login:', demoRes.status, demoData.data?.user?.name);
+  const candidateData = await candidateRes.json();
+  console.log('9. POST /api/auth/register:', candidateRes.status, candidateData.data?.user?.name);
 }
 
 test().catch(console.error);

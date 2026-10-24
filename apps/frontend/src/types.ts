@@ -50,6 +50,8 @@ export interface UserSession {
   githubUrl?: string;
   linkedinUrl?: string;
   portfolioUrl?: string;
+  portfolioImage?: string;
+  portfolioProjectTitle?: string;
   plan?: string;
 }
 

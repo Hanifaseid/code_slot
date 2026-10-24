@@ -6,18 +6,9 @@ import {
   AdminAuditEntry,
   AdminStats,
   UserStatus,
-  ApplicationStage
+  ApplicationStage,
 } from '../types/admin';
-import {
-  initialManagedUsers,
-  initialActivityEvents,
-  initialApplications,
-  initialAIStudioSessions,
-  initialAuditLogs,
-  initialAdminStats
-} from '../data/adminMockData';
 import { apiClient } from './apiClient';
-
 
 const STORAGE_USERS = 'codeslot_admin_users';
 const STORAGE_ACTIVITIES = 'codeslot_admin_activities';
@@ -25,15 +16,24 @@ const STORAGE_APPLICATIONS = 'codeslot_admin_applications';
 const STORAGE_AI_SESSIONS = 'codeslot_admin_ai_sessions';
 const STORAGE_AUDIT = 'codeslot_admin_audit';
 
-// Helper to get or set initial
+// Helper to get stored item and flush stale mock data if present
 function getStored<T>(key: string, defaultVal: T): T {
   try {
     const raw = localStorage.getItem(key);
     if (!raw) {
-      localStorage.setItem(key, JSON.stringify(defaultVal));
       return defaultVal;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    // If old mock data exists with demo users like usr-101 or alex.mercer, flush it
+    if (
+      key === STORAGE_USERS &&
+      Array.isArray(parsed) &&
+      parsed.some((u: any) => u.id === 'usr-101' || u.email?.includes('alex.mercer'))
+    ) {
+      localStorage.removeItem(key);
+      return defaultVal;
+    }
+    return parsed;
   } catch {
     return defaultVal;
   }
@@ -54,18 +54,35 @@ export const adminService = {
     const aiSessions = this.getAISessions();
     const activities = this.getActivities();
 
+    const activeCount = users.filter((u) => u.status === 'active' || u.status === 'verified').length;
+    const avgImprovement =
+      aiSessions.length > 0
+        ? Math.round(
+            aiSessions.reduce(
+              (acc, s) => acc + (s.improvement || (s.tailoredAtsScore - s.initialAtsScore) || 20),
+              0
+            ) / aiSessions.length
+          )
+        : 0;
+    const jobViews = activities.filter((a) => a.type === 'job_view' || a.category === 'jobs').length;
+
     return {
-      ...initialAdminStats,
-      totalUsers: users.length * 119, // extrapolated realistic scaled count
-      dailyActiveUsers: users.filter((u) => u.status === 'active').length * 28 + 14,
-      totalApplications: apps.length * 52 + 18,
-      aiResumesTailored: aiSessions.length * 48 + 26,
-      totalJobViews: activities.length * 240 + 1200
+      totalUsers: users.length,
+      dailyActiveUsers: activeCount,
+      totalApplications: apps.length,
+      aiResumesTailored: aiSessions.length,
+      totalJobViews: jobViews,
+      avgAtsImprovement: avgImprovement,
+      conversionRate: users.length > 0 ? Math.round((apps.length / users.length) * 100) : 0,
+      systemHealthScore: 100,
+      userGrowthPct: users.length > 0 ? Math.min(users.length * 10, 100) : 0,
+      applicationGrowthPct: apps.length > 0 ? Math.min(apps.length * 15, 100) : 0,
+      resumesGrowthPct: aiSessions.length > 0 ? Math.min(aiSessions.length * 20, 100) : 0,
     };
   },
 
   getUsers(): ManagedUser[] {
-    return getStored<ManagedUser[]>(STORAGE_USERS, initialManagedUsers);
+    return getStored<ManagedUser[]>(STORAGE_USERS, []);
   },
 
   updateUserStatus(userId: string, status: UserStatus): ManagedUser[] {
@@ -80,10 +97,10 @@ export const adminService = {
       target: userId,
       details: `Changed status of user ${userId} to "${status}"`,
       timestamp: new Date().toISOString(),
-      ip: '127.0.0.1'
+      ip: '127.0.0.1',
     });
 
-    // Sync to backend asynchronously
+    // Sync to backend
     apiClient.patch(`/admin/users/${userId}/status`, { status }).catch((err) => {
       console.debug('Async status sync to backend deferred:', err);
     });
@@ -92,17 +109,17 @@ export const adminService = {
   },
 
   getActivities(): UserActivityEvent[] {
-    return getStored<UserActivityEvent[]>(STORAGE_ACTIVITIES, initialActivityEvents);
+    return getStored<UserActivityEvent[]>(STORAGE_ACTIVITIES, []);
   },
 
   addActivity(event: Omit<UserActivityEvent, 'id' | 'timestamp'>): UserActivityEvent {
     const newEvent: UserActivityEvent = {
       ...event,
       id: `act-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
     const current = this.getActivities();
-    const updated = [newEvent, ...current].slice(0, 150); // keep recent 150
+    const updated = [newEvent, ...current].slice(0, 150);
     setStored(STORAGE_ACTIVITIES, updated);
 
     // Sync to backend asynchronously
@@ -114,7 +131,7 @@ export const adminService = {
   },
 
   getApplications(): JobApplicationRecord[] {
-    return getStored<JobApplicationRecord[]>(STORAGE_APPLICATIONS, initialApplications);
+    return getStored<JobApplicationRecord[]>(STORAGE_APPLICATIONS, []);
   },
 
   updateApplicationStage(appId: string, stage: ApplicationStage): JobApplicationRecord[] {
@@ -128,7 +145,7 @@ export const adminService = {
       target: appId,
       details: `Advanced candidate application ${appId} to stage: ${stage.toUpperCase()}`,
       timestamp: new Date().toISOString(),
-      ip: '127.0.0.1'
+      ip: '127.0.0.1',
     });
 
     // Sync to backend asynchronously
@@ -140,11 +157,11 @@ export const adminService = {
   },
 
   getAISessions(): AIStudioSessionRecord[] {
-    return getStored<AIStudioSessionRecord[]>(STORAGE_AI_SESSIONS, initialAIStudioSessions);
+    return getStored<AIStudioSessionRecord[]>(STORAGE_AI_SESSIONS, []);
   },
 
   getAuditLogs(): AdminAuditEntry[] {
-    return getStored<AdminAuditEntry[]>(STORAGE_AUDIT, initialAuditLogs);
+    return getStored<AdminAuditEntry[]>(STORAGE_AUDIT, []);
   },
 
   addAuditEntry(entry: AdminAuditEntry): void {
@@ -153,15 +170,16 @@ export const adminService = {
   },
 
   /**
-   * Synchronize state from backend control plane when online
+   * Synchronize state from backend control plane
    */
   async syncFromBackend(): Promise<void> {
     try {
-      const [usersRes, appsRes, actsRes, aiRes] = await Promise.allSettled([
+      const [usersRes, appsRes, actsRes, aiRes, auditRes] = await Promise.allSettled([
         apiClient.get<ManagedUser[]>('/admin/users'),
         apiClient.get<JobApplicationRecord[]>('/admin/applications'),
         apiClient.get<UserActivityEvent[]>('/admin/activities'),
         apiClient.get<AIStudioSessionRecord[]>('/admin/ai-sessions'),
+        apiClient.get<AdminAuditEntry[]>('/admin/audit-logs'),
       ]);
 
       if (usersRes.status === 'fulfilled' && usersRes.value.success && usersRes.value.data) {
@@ -176,89 +194,40 @@ export const adminService = {
       if (aiRes.status === 'fulfilled' && aiRes.value.success && aiRes.value.data) {
         setStored(STORAGE_AI_SESSIONS, aiRes.value.data);
       }
+      if (auditRes.status === 'fulfilled' && auditRes.value.success && auditRes.value.data) {
+        setStored(STORAGE_AUDIT, auditRes.value.data);
+      }
     } catch (err) {
       console.debug('Backend sync deferred:', err);
     }
   },
 
-  // Generates a realistic simulated live event for testing and live demonstration
-  generateSimulatedEvent(): UserActivityEvent {
-    const users = this.getUsers();
-    const randomUser = users[Math.floor(Math.random() * users.length)];
-
-    const eventTemplates = [
-      {
-        type: 'job_apply' as const,
-        category: 'jobs' as const,
-        action: 'Direct Verified Job Application',
-        details: `Submitted resume to ${['Linear', 'Stripe', 'OpenAI', 'Vercel', 'Supabase', 'Figma', 'Datadog'][Math.floor(Math.random() * 7)]} via official CodeSlot portal link`,
-        severity: 'success' as const
-      },
-      {
-        type: 'resume_tailor' as const,
-        category: 'ai_studio' as const,
-        action: 'AI Studio ATS Optimization',
-        details: `Tailored CV score from ${Math.floor(Math.random() * 20 + 60)}% to ${Math.floor(Math.random() * 10 + 90)}% for Senior Engineering role`,
-        severity: 'success' as const
-      },
-      {
-        type: 'job_search' as const,
-        category: 'jobs' as const,
-        action: 'Executed Keyword Search',
-        details: `Filtered opportunities for: "${['Rust Distributed Systems', 'Next.js 15 Full Stack', 'Kubernetes Platform', 'Staff AI Researcher', 'Elixir Phoenix'][Math.floor(Math.random() * 5)]}"`,
-        severity: 'info' as const
-      },
-      {
-        type: 'job_save' as const,
-        category: 'jobs' as const,
-        action: 'Bookmarked Position',
-        details: `Added remote listing to private tracker (${['$180k-$220k', '$200k-$260k', '$160k-$210k'][Math.floor(Math.random() * 3)]})`,
-        severity: 'info' as const
-      },
-      {
-        type: 'login' as const,
-        category: 'auth' as const,
-        action: 'Candidate Session Active',
-        details: 'User authenticated from authenticated device',
-        severity: 'info' as const
+  async getBroadcast(): Promise<{ message: string; active: boolean } | null> {
+    try {
+      const res = await apiClient.get<{ announcement: { message: string; active: boolean } }>('/admin/broadcast');
+      if (res.success && res.data?.announcement) {
+        return res.data.announcement;
       }
-    ];
+    } catch (err) {
+      console.debug('Failed to get broadcast:', err);
+    }
+    return null;
+  },
 
-    const template = eventTemplates[Math.floor(Math.random() * eventTemplates.length)];
-
-    const locations = [
-      'San Francisco, US',
-      'London, UK',
-      'Berlin, DE',
-      'Zurich, CH',
-      'Tokyo, JP',
-      'Toronto, CA',
-      'Seattle, US',
-      'Amsterdam, NL'
-    ];
-
-    return this.addActivity({
-      userId: randomUser.id,
-      userName: randomUser.name,
-      userEmail: randomUser.email,
-      userAvatar: randomUser.avatar,
-      type: template.type,
-      category: template.category,
-      action: template.action,
-      details: template.details,
-      ip: `198.51.100.${Math.floor(Math.random() * 240 + 10)}`,
-      location: locations[Math.floor(Math.random() * locations.length)],
-      device: ['macOS · Chrome 128', 'Windows 11 · Edge', 'Ubuntu 24.04 · Firefox', 'iOS 18 · Safari'][
-        Math.floor(Math.random() * 4)
-      ],
-      severity: template.severity
-    });
+  async setBroadcast(message: string, active: boolean): Promise<boolean> {
+    try {
+      const res = await apiClient.post('/admin/broadcast', { message, active });
+      return res.success;
+    } catch (err) {
+      console.debug('Failed to set broadcast:', err);
+      return false;
+    }
   },
 
   exportToCSV(dataType: 'activities' | 'users' | 'applications'): void {
     let headers: string[] = [];
     let rows: string[][] = [];
-    let filename = `codeslot_${dataType}_${new Date().toISOString().slice(0, 10)}.csv`;
+    const filename = `codeslot_${dataType}_${new Date().toISOString().slice(0, 10)}.csv`;
 
     if (dataType === 'activities') {
       const activities = this.getActivities();
@@ -272,11 +241,22 @@ export const adminService = {
         `"${a.action.replace(/"/g, '""')}"`,
         `"${a.details.replace(/"/g, '""')}"`,
         `"${a.location}"`,
-        a.timestamp
+        a.timestamp,
       ]);
     } else if (dataType === 'users') {
       const users = this.getUsers();
-      headers = ['ID', 'Name', 'Email', 'Role', 'Status', 'Plan', 'Applications', 'Saved Jobs', 'ATS Score', 'Specialization'];
+      headers = [
+        'ID',
+        'Name',
+        'Email',
+        'Role',
+        'Status',
+        'Plan',
+        'Applications',
+        'Saved Jobs',
+        'ATS Score',
+        'Specialization',
+      ];
       rows = users.map((u) => [
         u.id,
         `"${u.name}"`,
@@ -287,7 +267,7 @@ export const adminService = {
         String(u.appliedCount),
         String(u.savedCount),
         String(u.resumeScore),
-        `"${u.specialization}"`
+        `"${u.specialization}"`,
       ]);
     } else if (dataType === 'applications') {
       const apps = this.getApplications();
@@ -300,7 +280,7 @@ export const adminService = {
         `"${app.company}"`,
         app.stage,
         String(app.matchScore),
-        app.appliedAt
+        app.appliedAt,
       ]);
     }
 
@@ -313,5 +293,5 @@ export const adminService = {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }
+  },
 };

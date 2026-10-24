@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
   Terminal,
@@ -10,24 +10,52 @@ import {
   Bell,
   Cpu,
   Lock,
-  Download
+  Download,
+  Send,
 } from 'lucide-react';
 import { AdminAuditEntry } from '../../types/admin';
+import { adminService } from '../../services/adminService';
 
 interface AdminSystemViewProps {
   auditLogs: AdminAuditEntry[];
-  onTriggerTrafficSpike: () => void;
   onClearCache: () => void;
+  onRefreshTelemetry?: () => void;
 }
 
 export const AdminSystemView: React.FC<AdminSystemViewProps> = ({
   auditLogs,
-  onTriggerTrafficSpike,
-  onClearCache
+  onClearCache,
+  onRefreshTelemetry,
 }) => {
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [isBroadcastActive, setIsBroadcastActive] = useState(false);
-  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [isSavingBroadcast, setIsSavingBroadcast] = useState(false);
+  const [broadcastFeedback, setBroadcastFeedback] = useState<string | null>(null);
+
+  useEffect(() => {
+    adminService.getBroadcast().then((b) => {
+      if (b) {
+        setBroadcastMessage(b.message || '');
+        setIsBroadcastActive(Boolean(b.active));
+      }
+    });
+  }, []);
+
+  const handleSaveBroadcast = async () => {
+    setIsSavingBroadcast(true);
+    setBroadcastFeedback(null);
+    try {
+      const ok = await adminService.setBroadcast(broadcastMessage, isBroadcastActive);
+      if (ok) {
+        setBroadcastFeedback('Live announcement updated across platform!');
+        setTimeout(() => setBroadcastFeedback(null), 3500);
+      } else {
+        setBroadcastFeedback('Failed to update announcement on backend.');
+      }
+    } finally {
+      setIsSavingBroadcast(false);
+    }
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -36,7 +64,7 @@ export const AdminSystemView: React.FC<AdminSystemViewProps> = ({
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">
-              Platform Health & Admin Audit Trail
+              Platform <span className="text-orange-500 font-extrabold">H</span>ealth & Admin <span className="text-orange-500 font-extrabold">A</span>udit <span className="text-orange-500 font-extrabold">T</span>rail
             </h1>
             <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold">
               All Systems Operational
@@ -47,15 +75,17 @@ export const AdminSystemView: React.FC<AdminSystemViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onTriggerTrafficSpike}
-            className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-          >
-            <Zap className="w-3.5 h-3.5 fill-neutral-950" />
-            <span>Simulate Traffic Surge</span>
-          </button>
-        </div>
+        {onRefreshTelemetry && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onRefreshTelemetry}
+              className="px-3.5 py-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-neutral-950 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-neutral-950" />
+              <span>Refresh Telemetry</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* System Telemetry Cards */}
@@ -75,7 +105,7 @@ export const AdminSystemView: React.FC<AdminSystemViewProps> = ({
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-2xl font-extrabold text-neutral-900">8 Feeds Live</div>
-          <div className="text-xs text-neutral-400">Next sync in 4m 12s · Zero parsing bottlenecks</div>
+          <div className="text-xs text-neutral-400">Next sync in 4m 12s · Verified scraping engine</div>
         </div>
 
         <div className="p-5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs space-y-3">
@@ -84,7 +114,7 @@ export const AdminSystemView: React.FC<AdminSystemViewProps> = ({
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-2xl font-extrabold text-neutral-900">Protected</div>
-          <div className="text-xs text-neutral-400">Credential gating active (admin@gmail.com)</div>
+          <div className="text-xs text-neutral-400">Verified credentials gating active (admin@gmail.com)</div>
         </div>
       </div>
 
@@ -92,9 +122,18 @@ export const AdminSystemView: React.FC<AdminSystemViewProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Broadcast Box */}
         <div className="p-6 rounded-3xl bg-white border border-neutral-200/80 shadow-xs space-y-4">
-          <div className="flex items-center gap-2">
-            <Bell className="w-4 h-4 text-amber-600" />
-            <h3 className="text-base font-bold text-neutral-900">Global Announcement Banner</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-orange-600" />
+              <h3 className="text-base font-bold text-neutral-900">
+                Global <span className="text-orange-500 font-extrabold">A</span>nnouncement <span className="text-orange-500 font-extrabold">B</span>anner
+              </h3>
+            </div>
+            {isBroadcastActive && (
+              <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                ● Broadcasting Live
+              </span>
+            )}
           </div>
           <p className="text-xs text-neutral-500">
             Broadcast a prominent banner to all visiting developers across the CodeSlot website and job board.
@@ -105,7 +144,7 @@ export const AdminSystemView: React.FC<AdminSystemViewProps> = ({
             value={broadcastMessage}
             onChange={(e) => setBroadcastMessage(e.target.value)}
             placeholder="e.g. ⚡ 40+ new verified remote engineering roles just added from Stripe & OpenAI"
-            className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-xs text-neutral-900 focus:outline-hidden focus:ring-1 focus:ring-neutral-900"
+            className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-xs text-neutral-900 focus:outline-hidden focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
           />
 
           <div className="flex items-center justify-between pt-1">
@@ -114,44 +153,47 @@ export const AdminSystemView: React.FC<AdminSystemViewProps> = ({
                 type="checkbox"
                 checked={isBroadcastActive}
                 onChange={(e) => setIsBroadcastActive(e.target.checked)}
-                className="w-4 h-4 rounded-md accent-neutral-900 cursor-pointer"
+                className="w-4 h-4 rounded-md accent-orange-500 cursor-pointer"
               />
               <span>Activate Announcement Live</span>
             </label>
 
-            {isBroadcastActive && (
-              <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-                ● Broadcasting Live
-              </span>
-            )}
+            <button
+              onClick={handleSaveBroadcast}
+              disabled={isSavingBroadcast}
+              className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-neutral-950 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>{isSavingBroadcast ? 'Publishing...' : 'Publish Banner'}</span>
+            </button>
           </div>
+
+          {broadcastFeedback && (
+            <div className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 p-2 rounded-xl">
+              {broadcastFeedback}
+            </div>
+          )}
         </div>
 
         {/* Maintenance & Cache Controls */}
         <div className="p-6 rounded-3xl bg-white border border-neutral-200/80 shadow-xs space-y-4">
           <div className="flex items-center gap-2">
             <Server className="w-4 h-4 text-neutral-700" />
-            <h3 className="text-base font-bold text-neutral-900">Client Runtime Maintenance</h3>
+            <h3 className="text-base font-bold text-neutral-900">
+              Client Runtime <span className="text-orange-500 font-extrabold">M</span>aintenance
+            </h3>
           </div>
           <p className="text-xs text-neutral-500">
-            Clear stored telemetry cache, reset demo seed datasets, or test system failure modes.
+            Clear stored telemetry cache and synchronize latest candidate data and activity logs directly from the backend.
           </p>
 
           <div className="space-y-3 pt-2">
             <button
               onClick={onClearCache}
-              className="w-full py-2.5 px-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-xl bg-orange-50/70 hover:bg-orange-100/70 text-orange-950 border border-orange-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Reset Admin State & Re-seed Realistic Telemetry</span>
-            </button>
-
-            <button
-              onClick={onTriggerTrafficSpike}
-              className="w-full py-2.5 px-4 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
-            >
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
-              <span>Simulate Peak 10-Candidate Application Surge</span>
+              <RefreshCw className="w-3.5 h-3.5 text-orange-600" />
+              <span>Reset Local Cache & Fetch Backend State</span>
             </button>
           </div>
         </div>
@@ -161,46 +203,54 @@ export const AdminSystemView: React.FC<AdminSystemViewProps> = ({
       <div className="bg-white rounded-3xl border border-neutral-200/80 shadow-xs overflow-hidden">
         <div className="p-5 border-b border-neutral-100 flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-neutral-900">Administrative Security Audit Trail</h3>
+            <h3 className="text-base font-bold text-neutral-900">
+              Administrative Security <span className="text-orange-500 font-extrabold">A</span>udit <span className="text-orange-500 font-extrabold">T</span>rail
+            </h3>
             <p className="text-xs text-neutral-500">Tamper-evident log of all admin logins, user status updates, and exports</p>
           </div>
           <span className="text-xs text-neutral-400 font-mono">Immutable Log</span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="border-b border-neutral-100 bg-neutral-50/70 text-neutral-500 font-bold uppercase tracking-wider text-[11px]">
-                <th className="py-3 px-4 sm:px-6">Admin Account</th>
-                <th className="py-3 px-4">Action Type</th>
-                <th className="py-3 px-4">Target Resource</th>
-                <th className="py-3 px-4">Operation Details</th>
-                <th className="py-3 px-4 text-right">Timestamp</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100">
-              {auditLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-neutral-50/80 transition-colors">
-                  <td className="py-3.5 px-4 sm:px-6 font-bold text-neutral-900">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                      <span>{log.adminEmail}</span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <span className="px-2 py-0.5 rounded-md bg-neutral-900 text-white font-mono text-[10px] font-bold">
-                      {log.action}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 font-semibold text-neutral-800">{log.target}</td>
-                  <td className="py-3.5 px-4 text-neutral-600 max-w-xs">{log.details}</td>
-                  <td className="py-3.5 px-4 text-right text-neutral-400 text-[11px]">
-                    {new Date(log.timestamp).toLocaleDateString()} {new Date(log.timestamp).toLocaleTimeString()}
-                  </td>
+          {auditLogs.length === 0 ? (
+            <div className="py-12 text-center text-neutral-400 text-xs italic">
+              No administrative audit entries recorded yet.
+            </div>
+          ) : (
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-neutral-100 bg-neutral-50/70 text-neutral-500 font-bold uppercase tracking-wider text-[11px]">
+                  <th className="py-3 px-4 sm:px-6">Admin Account</th>
+                  <th className="py-3 px-4">Action Type</th>
+                  <th className="py-3 px-4">Target Resource</th>
+                  <th className="py-3 px-4">Operation Details</th>
+                  <th className="py-3 px-4 text-right">Timestamp</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-neutral-100">
+                {auditLogs.map((log) => (
+                  <tr key={log.id} className="hover:bg-neutral-50/80 transition-colors">
+                    <td className="py-3.5 px-4 sm:px-6 font-bold text-neutral-900">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span>{log.adminEmail}</span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className="px-2 py-0.5 rounded-md bg-neutral-900 text-white font-mono text-[10px] font-bold">
+                        {log.action}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 font-semibold text-neutral-800">{log.target}</td>
+                    <td className="py-3.5 px-4 text-neutral-600 max-w-xs">{log.details}</td>
+                    <td className="py-3.5 px-4 text-right text-neutral-400 text-[11px]">
+                      {new Date(log.timestamp).toLocaleDateString()} {new Date(log.timestamp).toLocaleTimeString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

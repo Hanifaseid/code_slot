@@ -61,6 +61,8 @@ export interface ManagedUser {
   githubUrl?: string;
   linkedinUrl?: string;
   portfolioUrl?: string;
+  portfolioImage?: string;
+  portfolioProjectTitle?: string;
 }
 
 export type ApplicationStage = 'applied' | 'screening' | 'interview' | 'offer' | 'rejected' | 'archived';

@@ -8,22 +8,26 @@ describe('CodeSlot Full Backend API Endpoints', () => {
 
   // 1. Auth Module Tests
   describe('Auth Module (/api/auth)', () => {
-    it('POST /api/auth/demo-login should authenticate demo candidate and return JWT', async () => {
+    it('POST /api/auth/register should register a new candidate and return JWT', async () => {
       const res = await request(app)
-        .post('/api/auth/demo-login')
-        .send({ role: 'candidate' });
+        .post('/api/auth/register')
+        .send({
+          email: 'sarah.engineer@codeslot.dev',
+          password: 'securePassword123',
+          name: 'Sarah Engineer',
+        });
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(201);
       expect(res.body.success).toBe(true);
       expect(res.body.data).toHaveProperty('token');
-      expect(res.body.data.user).toHaveProperty('email', 'alex.mercer@codeslot.dev');
+      expect(res.body.data.user).toHaveProperty('email', 'sarah.engineer@codeslot.dev');
       authToken = res.body.data.token;
     });
 
-    it('POST /api/auth/demo-login should authenticate demo admin', async () => {
+    it('POST /api/auth/login should authenticate admin with valid credentials', async () => {
       const res = await request(app)
-        .post('/api/auth/demo-login')
-        .send({ role: 'admin' });
+        .post('/api/auth/login')
+        .send({ email: 'admin@gmail.com', password: 'admin1122' });
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
@@ -38,7 +42,7 @@ describe('CodeSlot Full Backend API Endpoints', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.data.user).toHaveProperty('email', 'alex.mercer@codeslot.dev');
+      expect(res.body.data.user).toHaveProperty('email', 'sarah.engineer@codeslot.dev');
     });
 
     it('PATCH /api/auth/profile should update authenticated user profile', async () => {
@@ -124,9 +128,9 @@ describe('CodeSlot Full Backend API Endpoints', () => {
     it('POST /api/resume/tailor should tailor candidate resume against job description', async () => {
       const sampleResume = {
         personalInfo: {
-          fullName: 'Alex Mercer',
+          fullName: 'Sarah Jenkins',
           jobTitle: 'Distributed Systems Engineer',
-          email: 'alex@example.com',
+          email: 'sarah.jenkins@example.com',
           phone: '+1-555-0199',
           location: 'Austin, TX',
           summary: 'Experienced backend systems developer.',
@@ -182,9 +186,9 @@ describe('CodeSlot Full Backend API Endpoints', () => {
     it('POST /api/resume/save and GET /api/resume/mine should store and list candidate resumes', async () => {
       const sampleContent = {
         personalInfo: {
-          fullName: 'Alex Mercer',
+          fullName: 'Sarah Jenkins',
           jobTitle: 'Staff Engineer',
-          email: 'alex@codeslot.dev',
+          email: 'sarah.jenkins@codeslot.dev',
           phone: '+1 555 0100',
           location: 'Austin, TX',
           summary: 'Cloud Systems Leader',

@@ -19,24 +19,21 @@ import {
   ChevronDown,
   X,
   Play,
-  Pause
+  Pause,
+  RefreshCw,
 } from 'lucide-react';
 import { UserActivityEvent, ActivityCategory, EventSeverity } from '../../types/admin';
 
 interface AdminActivitiesViewProps {
   activities: UserActivityEvent[];
-  isLiveSimulationActive: boolean;
-  onToggleSimulation: () => void;
-  onSimulateEvent: () => void;
+  onRefreshFeed: () => void;
   onExportCSV: () => void;
 }
 
 export const AdminActivitiesView: React.FC<AdminActivitiesViewProps> = ({
   activities,
-  isLiveSimulationActive,
-  onToggleSimulation,
-  onSimulateEvent,
-  onExportCSV
+  onRefreshFeed,
+  onExportCSV,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -135,7 +132,7 @@ export const AdminActivitiesView: React.FC<AdminActivitiesViewProps> = ({
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">
-              User Activity Event Stream
+              <span className="text-orange-500 font-extrabold">U</span>ser <span className="text-orange-500 font-extrabold">A</span>ctivity <span className="text-orange-500 font-extrabold">E</span>vent <span className="text-orange-500 font-extrabold">S</span>tream
             </h1>
             <span className="px-2.5 py-0.5 rounded-full bg-neutral-900 text-white text-xs font-bold">
               {activities.length} Events Logged
@@ -147,41 +144,19 @@ export const AdminActivitiesView: React.FC<AdminActivitiesViewProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {/* Live Simulator Toggle */}
           <button
-            onClick={onToggleSimulation}
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${isLiveSimulationActive
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-              }`}
+            onClick={onRefreshFeed}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-neutral-950 font-bold text-xs transition-colors cursor-pointer"
           >
-            {isLiveSimulationActive ? (
-              <>
-                <Pause className="w-3.5 h-3.5" />
-                <span>Live Feed Active</span>
-                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-              </>
-            ) : (
-              <>
-                <Play className="w-3.5 h-3.5" />
-                <span>Start Live Ticker</span>
-              </>
-            )}
-          </button>
-
-          <button
-            onClick={onSimulateEvent}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs transition-colors cursor-pointer"
-          >
-            <Zap className="w-3.5 h-3.5 fill-neutral-950" />
-            <span>Generate Test Event</span>
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Refresh Stream</span>
           </button>
 
           <button
             onClick={onExportCSV}
             className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-medium text-xs transition-colors cursor-pointer"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5 text-orange-400" />
             <span>Export CSV</span>
           </button>
         </div>
@@ -195,15 +170,17 @@ export const AdminActivitiesView: React.FC<AdminActivitiesViewProps> = ({
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${selectedCategory === cat.id
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                selectedCategory === cat.id
                   ? 'bg-neutral-900 text-white shadow-xs'
-                  : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200/80'
-                }`}
+                  : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200/80 hover:border-orange-300'
+              }`}
             >
               <span>{cat.label}</span>
               <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full ${selectedCategory === cat.id ? 'bg-neutral-700 text-white' : 'bg-neutral-100 text-neutral-600'
-                  }`}
+                className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                  selectedCategory === cat.id ? 'bg-orange-500 text-white' : 'bg-neutral-100 text-neutral-600'
+                }`}
               >
                 {cat.count}
               </span>
@@ -214,13 +191,13 @@ export const AdminActivitiesView: React.FC<AdminActivitiesViewProps> = ({
         {/* Search & Severity Filters */}
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
           <div className="sm:col-span-8 relative">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-orange-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by candidate name, email, action keyword, IP, or location..."
-              className="w-full pl-9 pr-4 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-hidden focus:ring-1 focus:ring-neutral-900"
+              className="w-full pl-9 pr-4 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-900 placeholder:text-neutral-400 focus:outline-hidden focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
             />
             {searchQuery && (
               <button
@@ -237,7 +214,7 @@ export const AdminActivitiesView: React.FC<AdminActivitiesViewProps> = ({
               <select
                 value={selectedSeverity}
                 onChange={(e) => setSelectedSeverity(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium focus:outline-hidden focus:ring-1 focus:ring-neutral-900"
+                className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium hover:border-orange-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
               >
                 <option value="all">All Severities</option>
                 <option value="success">Success only</option>

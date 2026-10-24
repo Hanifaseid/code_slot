@@ -22,16 +22,6 @@ export class AuthController {
     }
   }
 
-  async demoLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const role = (req.body?.role || 'candidate') as 'admin' | 'candidate' | 'recruiter';
-      const result = await authService.demoLogin(role);
-      sendSuccess(res, result, 200);
-    } catch (error) {
-      next(error);
-    }
-  }
-
   async getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.user?.userId) {

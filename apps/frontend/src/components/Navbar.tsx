@@ -82,7 +82,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="font-logo text-xl md:text-[22px] font-extrabold text-neutral-950 tracking-tight select-none hover:opacity-80 transition-opacity cursor-pointer text-left"
             aria-label="CodeSlot Home"
           >
-            CODESLOT
+            CODE<span className="text-orange-500">SLOT</span>
           </button>
 
           {/* Desktop Nav Items */}
