@@ -22,6 +22,16 @@ import {
 } from 'lucide-react';
 import { UserSession } from '../types';
 import { apiClient } from '../services/apiClient';
+import { CustomFilterDropdown, DropdownOption } from './CustomFilterDropdown';
+
+const ENGINEERING_TRACK_OPTIONS: DropdownOption[] = [
+  { value: 'Full Stack', label: 'Full Stack' },
+  { value: 'Backend', label: 'Backend Systems' },
+  { value: 'Frontend', label: 'Frontend & Web' },
+  { value: 'AI / ML', label: 'AI & Machine Learning' },
+  { value: 'DevOps / Cloud', label: 'DevOps & Cloud Infra' },
+  { value: 'Mobile', label: 'Mobile Engineering' },
+];
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -273,18 +283,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   <label className="text-[11px] font-bold text-neutral-700 uppercase tracking-wider">
                     Engineering Track
                   </label>
-                  <select
+                  <CustomFilterDropdown
+                    id="profile-engineering-track"
                     value={specialization}
-                    onChange={(e) => setSpecialization(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-900 text-xs font-medium focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
-                  >
-                    <option value="Full Stack">Full Stack</option>
-                    <option value="Backend">Backend Systems</option>
-                    <option value="Frontend">Frontend & Web</option>
-                    <option value="AI / ML">AI & Machine Learning</option>
-                    <option value="DevOps / Cloud">DevOps & Cloud Infra</option>
-                    <option value="Mobile">Mobile Engineering</option>
-                  </select>
+                    onChange={(val) => setSpecialization(val)}
+                    options={ENGINEERING_TRACK_OPTIONS}
+                    className="w-full"
+                  />
                 </div>
               </div>
 

@@ -12,6 +12,23 @@ import {
   X
 } from 'lucide-react';
 import { Job } from '../../types';
+import { CustomFilterDropdown, DropdownOption } from '../CustomFilterDropdown';
+
+const SOURCE_FEED_OPTIONS: DropdownOption[] = [
+  { value: 'all', label: 'All Sourced Feeds' },
+  { value: 'yc', label: 'Y Combinator' },
+  { value: 'remotive', label: 'Remotive' },
+  { value: 'remoteok', label: 'RemoteOK' },
+  { value: 'jobicy', label: 'Jobicy' },
+  { value: 'wwr', label: 'WeWorkRemotely' },
+];
+
+const EXPERIENCE_MODAL_OPTIONS: DropdownOption[] = [
+  { value: 'Junior', label: '🌱 Junior (0–2 years)' },
+  { value: 'Intermediate', label: '🚀 Intermediate / Mid-Level (2–5 years)' },
+  { value: 'Senior', label: '⚡ Senior Developer (5+ years)' },
+  { value: 'Lead', label: '👑 Staff / Lead / Principal (8+ years)' },
+];
 
 interface AdminJobsInventoryViewProps {
   jobs: Job[];
@@ -140,18 +157,14 @@ export const AdminJobsInventoryView: React.FC<AdminJobsInventoryViewProps> = ({ 
         </div>
 
         <div className="sm:col-span-4">
-          <select
+          <CustomFilterDropdown
+            id="admin-filter-source"
             value={selectedSource}
-            onChange={(e) => setSelectedSource(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium hover:border-orange-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
-          >
-            <option value="all">All Sourced Feeds</option>
-            <option value="yc">Y Combinator</option>
-            <option value="remotive">Remotive</option>
-            <option value="remoteok">RemoteOK</option>
-            <option value="jobicy">Jobicy</option>
-            <option value="wwr">WeWorkRemotely</option>
-          </select>
+            onChange={(val) => setSelectedSource(val)}
+            options={SOURCE_FEED_OPTIONS}
+            isActive={selectedSource !== 'all'}
+            className="w-full"
+          />
         </div>
       </div>
 

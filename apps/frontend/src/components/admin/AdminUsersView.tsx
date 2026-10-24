@@ -22,6 +22,22 @@ import {
   Globe,
 } from 'lucide-react';
 import { ManagedUser, UserActivityEvent, JobApplicationRecord, UserStatus } from '../../types/admin';
+import { CustomFilterDropdown, DropdownOption } from '../CustomFilterDropdown';
+
+const STATUS_OPTIONS: DropdownOption[] = [
+  { value: 'all', label: 'All Account Statuses' },
+  { value: 'active', label: 'Active Only' },
+  { value: 'verified', label: 'Verified Only' },
+  { value: 'idle', label: 'Idle Only' },
+  { value: 'suspended', label: 'Suspended Only' },
+];
+
+const ROLE_OPTIONS: DropdownOption[] = [
+  { value: 'all', label: 'All Roles' },
+  { value: 'candidate', label: 'Candidates' },
+  { value: 'recruiter', label: 'Recruiters' },
+  { value: 'admin', label: 'Administrators' },
+];
 
 interface AdminUsersViewProps {
   users: ManagedUser[];
@@ -150,30 +166,25 @@ export const AdminUsersView: React.FC<AdminUsersViewProps> = ({
         </div>
 
         <div className="sm:col-span-3">
-          <select
+          <CustomFilterDropdown
+            id="admin-filter-status"
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium hover:border-orange-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
-          >
-            <option value="all">All Account Statuses</option>
-            <option value="active">Active Only</option>
-            <option value="verified">Verified Only</option>
-            <option value="idle">Idle Only</option>
-            <option value="suspended">Suspended Only</option>
-          </select>
+            onChange={(val) => setStatusFilter(val)}
+            options={STATUS_OPTIONS}
+            isActive={statusFilter !== 'all'}
+            className="w-full"
+          />
         </div>
 
         <div className="sm:col-span-3">
-          <select
+          <CustomFilterDropdown
+            id="admin-filter-role"
             value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium hover:border-orange-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
-          >
-            <option value="all">All Roles</option>
-            <option value="candidate">Candidates</option>
-            <option value="recruiter">Recruiters</option>
-            <option value="admin">Administrators</option>
-          </select>
+            onChange={(val) => setRoleFilter(val)}
+            options={ROLE_OPTIONS}
+            isActive={roleFilter !== 'all'}
+            className="w-full"
+          />
         </div>
       </div>
 

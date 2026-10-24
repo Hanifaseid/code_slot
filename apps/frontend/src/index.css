@@ -25,6 +25,33 @@
     font-family: var(--font-serif);
     letter-spacing: -0.02em;
   }
+
+  ::selection {
+    background-color: #f97316;
+    color: #ffffff;
+  }
+
+  ::-moz-selection {
+    background-color: #f97316;
+    color: #ffffff;
+  }
+}
+
+/* Custom orange scrollbars for dropdowns */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #fff7ed;
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #fdba74;
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #f97316;
 }
 
 /* Custom glow and mesh backdrops */

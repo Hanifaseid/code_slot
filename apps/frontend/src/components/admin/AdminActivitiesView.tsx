@@ -23,6 +23,14 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { UserActivityEvent, ActivityCategory, EventSeverity } from '../../types/admin';
+import { CustomFilterDropdown, DropdownOption } from '../CustomFilterDropdown';
+
+const SEVERITY_OPTIONS: DropdownOption[] = [
+  { value: 'all', label: 'All Severities' },
+  { value: 'success', label: 'Success only' },
+  { value: 'info', label: 'Info only' },
+  { value: 'warning', label: 'Warnings only' },
+];
 
 interface AdminActivitiesViewProps {
   activities: UserActivityEvent[];
@@ -211,16 +219,14 @@ export const AdminActivitiesView: React.FC<AdminActivitiesViewProps> = ({
 
           <div className="sm:col-span-4 flex items-center gap-2">
             <div className="flex-1 relative">
-              <select
+              <CustomFilterDropdown
+                id="admin-filter-severity"
                 value={selectedSeverity}
-                onChange={(e) => setSelectedSeverity(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium hover:border-orange-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
-              >
-                <option value="all">All Severities</option>
-                <option value="success">Success only</option>
-                <option value="info">Info only</option>
-                <option value="warning">Warnings only</option>
-              </select>
+                onChange={(val) => setSelectedSeverity(val)}
+                options={SEVERITY_OPTIONS}
+                isActive={selectedSeverity !== 'all'}
+                className="w-full"
+              />
             </div>
           </div>
         </div>

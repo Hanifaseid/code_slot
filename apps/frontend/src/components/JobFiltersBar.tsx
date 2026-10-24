@@ -18,8 +18,9 @@ import {
   ShieldCheck,
   BarChart3,
   Rocket,
-  Award
+  Award,
 } from 'lucide-react';
+import { CustomFilterDropdown, DropdownOption } from './CustomFilterDropdown';
 
 interface JobFiltersBarProps {
   filters: JobFilters;
@@ -40,6 +41,47 @@ export const SPECIALIZATION_TRACKS = [
   { id: 'Mobile', label: 'Mobile', icon: Smartphone },
   { id: 'Security & QA', label: 'Security & QA', icon: ShieldCheck },
   { id: 'Data & Analytics', label: 'Data & Analytics', icon: BarChart3 }
+];
+
+const SOURCE_OPTIONS: DropdownOption[] = [
+  { value: 'all', label: 'All Sources & Live Feeds' },
+  { value: 'yc', label: '🚀 Y Combinator / YC Startups' },
+  { value: 'startups', label: '🦄 All Startups (USA & Global)' },
+  { value: 'usa', label: '🇺🇸 USA Tech Startups & Jobs' },
+  { value: 'wwr', label: '🌐 WeWorkRemotely Global' },
+  { value: 'workingnomads', label: '🌍 WorkingNomads Global' },
+  { value: 'remotive', label: '⚡ Remotive Global Feed' },
+  { value: 'jobicy', label: '🎯 Jobicy Tech Portal' },
+  { value: 'remoteok', label: '💻 RemoteOK Network' },
+  { value: 'arbeitnow', label: '🇪🇺 Arbeitnow Tech Feed' },
+];
+
+const EXPERIENCE_OPTIONS: DropdownOption[] = [
+  { value: 'all', label: 'All Seniority Levels' },
+  { value: 'junior', label: '🌱 Junior / Entry (0-2 yrs)' },
+  { value: 'intermediate', label: '🚀 Intermediate / Mid (2-5 yrs)' },
+  { value: 'senior', label: '⚡ Senior Engineer (5+ yrs)' },
+  { value: 'lead', label: '👑 Staff / Lead / Principal' },
+];
+
+const JOB_TYPE_OPTIONS: DropdownOption[] = [
+  { value: 'all', label: 'All Employment Types' },
+  { value: 'Full-time', label: 'Full-time Roles' },
+  { value: 'Contract', label: 'Contract / Freelance' },
+  { value: 'Part-time', label: 'Part-time' },
+];
+
+const LOCATION_OPTIONS: DropdownOption[] = [
+  { value: 'all', label: 'Any Remote Location' },
+  { value: 'worldwide', label: 'Worldwide / Anywhere' },
+  { value: 'americas', label: 'Americas / US / Canada' },
+  { value: 'europe', label: 'Europe / EMEA' },
+];
+
+const SORT_OPTIONS: DropdownOption[] = [
+  { value: 'recent', label: 'Sort: Most Recent' },
+  { value: 'salary', label: 'Sort: Compensation' },
+  { value: 'company', label: 'Sort: Company Name' },
 ];
 
 export const JobFiltersBar: React.FC<JobFiltersBarProps> = ({
@@ -202,120 +244,59 @@ export const JobFiltersBar: React.FC<JobFiltersBarProps> = ({
       <div className="pt-3 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Source dropdown: YC Startups, USA Startups, Remotive, Jobicy, RemoteOK, Arbeitnow */}
-          <div
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all cursor-pointer shadow-2xs group ${
-              filters.source && filters.source !== 'all'
-                ? 'bg-gradient-to-r from-orange-100 via-amber-100 to-orange-100 border-orange-500 text-orange-950 ring-2 ring-orange-300/60 font-bold'
-                : 'bg-gradient-to-r from-orange-50/70 via-amber-50/50 to-orange-50/70 border-orange-300 hover:border-orange-500 hover:bg-orange-100/60 text-neutral-800 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-300/60'
-            }`}
-          >
-            <Rocket className="w-3.5 h-3.5 text-orange-600 shrink-0 group-hover:scale-110 transition-transform" />
-            <select
-              id="filter-source"
-              value={filters.source || 'all'}
-              onChange={(e) => onChange({ source: e.target.value, startupOnly: e.target.value === 'startups' || e.target.value === 'yc' })}
-              className="bg-transparent text-neutral-900 font-bold focus:outline-none cursor-pointer accent-orange-500 text-xs"
-            >
-              <option value="all">All Sources & Live Feeds</option>
-              <option value="yc">🚀 Y Combinator / YC Startups</option>
-              <option value="startups">🦄 All Startups (USA & Global)</option>
-              <option value="usa">🇺🇸 USA Tech Startups & Jobs</option>
-              <option value="wwr">🌐 WeWorkRemotely Global</option>
-              <option value="workingnomads">🌍 WorkingNomads Global</option>
-              <option value="remotive">⚡ Remotive Global Feed</option>
-              <option value="jobicy">🎯 Jobicy Tech Portal</option>
-              <option value="remoteok">💻 RemoteOK Network</option>
-              <option value="arbeitnow">🇪🇺 Arbeitnow Tech Feed</option>
-            </select>
-          </div>
+          <CustomFilterDropdown
+            id="filter-source"
+            value={filters.source || 'all'}
+            onChange={(val) => onChange({ source: val, startupOnly: val === 'startups' || val === 'yc' })}
+            options={SOURCE_OPTIONS}
+            icon={<Rocket className="w-3.5 h-3.5" />}
+            isActive={Boolean(filters.source && filters.source !== 'all')}
+            className="min-w-[190px]"
+          />
 
           {/* Experience Level dropdown */}
-          <div
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all cursor-pointer shadow-2xs group ${
-              filters.experienceLevel && filters.experienceLevel !== 'all'
-                ? 'bg-gradient-to-r from-orange-100 via-amber-100 to-orange-100 border-orange-500 text-orange-950 ring-2 ring-orange-300/60 font-bold'
-                : 'bg-gradient-to-r from-orange-50/70 via-amber-50/50 to-orange-50/70 border-orange-300 hover:border-orange-500 hover:bg-orange-100/60 text-neutral-800 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-300/60'
-            }`}
-          >
-            <Award className="w-3.5 h-3.5 text-orange-600 shrink-0 group-hover:scale-110 transition-transform" />
-            <select
-              id="filter-experience-level"
-              value={filters.experienceLevel || 'all'}
-              onChange={(e) => onChange({ experienceLevel: e.target.value })}
-              className="bg-transparent text-neutral-900 font-bold focus:outline-none cursor-pointer accent-orange-500 text-xs"
-            >
-              <option value="all">All Seniority Levels</option>
-              <option value="junior">🌱 Junior / Entry (0-2 yrs)</option>
-              <option value="intermediate">🚀 Intermediate / Mid (2-5 yrs)</option>
-              <option value="senior">⚡ Senior Engineer (5+ yrs)</option>
-              <option value="lead">👑 Staff / Lead / Principal</option>
-            </select>
-          </div>
+          <CustomFilterDropdown
+            id="filter-experience-level"
+            value={filters.experienceLevel || 'all'}
+            onChange={(val) => onChange({ experienceLevel: val })}
+            options={EXPERIENCE_OPTIONS}
+            icon={<Award className="w-3.5 h-3.5" />}
+            isActive={Boolean(filters.experienceLevel && filters.experienceLevel !== 'all')}
+            className="min-w-[175px]"
+          />
 
           {/* Job Type dropdown */}
-          <div
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all cursor-pointer shadow-2xs group ${
-              filters.jobType && filters.jobType !== 'all'
-                ? 'bg-gradient-to-r from-orange-100 via-amber-100 to-orange-100 border-orange-500 text-orange-950 ring-2 ring-orange-300/60 font-bold'
-                : 'bg-gradient-to-r from-orange-50/70 via-amber-50/50 to-orange-50/70 border-orange-300 hover:border-orange-500 hover:bg-orange-100/60 text-neutral-800 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-300/60'
-            }`}
-          >
-            <Briefcase className="w-3.5 h-3.5 text-orange-500 shrink-0 group-hover:scale-110 transition-transform" />
-            <select
-              id="filter-job-type"
-              value={filters.jobType}
-              onChange={(e) => onChange({ jobType: e.target.value })}
-              className="bg-transparent text-neutral-900 font-bold focus:outline-none cursor-pointer accent-orange-500 text-xs"
-            >
-              <option value="all">All Employment Types</option>
-              <option value="Full-time">Full-time Roles</option>
-              <option value="Contract">Contract / Freelance</option>
-              <option value="Part-time">Part-time</option>
-            </select>
-          </div>
+          <CustomFilterDropdown
+            id="filter-job-type"
+            value={filters.jobType || 'all'}
+            onChange={(val) => onChange({ jobType: val })}
+            options={JOB_TYPE_OPTIONS}
+            icon={<Briefcase className="w-3.5 h-3.5" />}
+            isActive={Boolean(filters.jobType && filters.jobType !== 'all')}
+            className="min-w-[170px]"
+          />
 
           {/* Location dropdown */}
-          <div
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all cursor-pointer shadow-2xs group ${
-              filters.location && filters.location !== 'all'
-                ? 'bg-gradient-to-r from-orange-100 via-amber-100 to-orange-100 border-orange-500 text-orange-950 ring-2 ring-orange-300/60 font-bold'
-                : 'bg-gradient-to-r from-orange-50/70 via-amber-50/50 to-orange-50/70 border-orange-300 hover:border-orange-500 hover:bg-orange-100/60 text-neutral-800 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-300/60'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5 text-orange-500 shrink-0 group-hover:scale-110 transition-transform" />
-            <select
-              id="filter-location"
-              value={filters.location}
-              onChange={(e) => onChange({ location: e.target.value })}
-              className="bg-transparent text-neutral-900 font-bold focus:outline-none cursor-pointer accent-orange-500 text-xs"
-            >
-              <option value="all">Any Remote Location</option>
-              <option value="worldwide">Worldwide / Anywhere</option>
-              <option value="americas">Americas / US / Canada</option>
-              <option value="europe">Europe / EMEA</option>
-            </select>
-          </div>
+          <CustomFilterDropdown
+            id="filter-location"
+            value={filters.location || 'all'}
+            onChange={(val) => onChange({ location: val })}
+            options={LOCATION_OPTIONS}
+            icon={<Globe className="w-3.5 h-3.5" />}
+            isActive={Boolean(filters.location && filters.location !== 'all')}
+            className="min-w-[175px]"
+          />
 
           {/* Sort By */}
-          <div
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all cursor-pointer shadow-2xs group ${
-              filters.sortBy && filters.sortBy !== 'recent'
-                ? 'bg-gradient-to-r from-orange-100 via-amber-100 to-orange-100 border-orange-500 text-orange-950 ring-2 ring-orange-300/60 font-bold'
-                : 'bg-gradient-to-r from-orange-50/70 via-amber-50/50 to-orange-50/70 border-orange-300 hover:border-orange-500 hover:bg-orange-100/60 text-neutral-800 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-300/60'
-            }`}
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5 text-orange-500 shrink-0 group-hover:scale-110 transition-transform" />
-            <select
-              id="filter-sort-by"
-              value={filters.sortBy}
-              onChange={(e) => onChange({ sortBy: e.target.value as any })}
-              className="bg-transparent text-neutral-900 font-bold focus:outline-none cursor-pointer accent-orange-500 text-xs"
-            >
-              <option value="recent">Sort: Most Recent</option>
-              <option value="salary">Sort: Compensation</option>
-              <option value="company">Sort: Company Name</option>
-            </select>
-          </div>
+          <CustomFilterDropdown
+            id="filter-sort-by"
+            value={filters.sortBy || 'recent'}
+            onChange={(val) => onChange({ sortBy: val as any })}
+            options={SORT_OPTIONS}
+            icon={<SlidersHorizontal className="w-3.5 h-3.5" />}
+            isActive={Boolean(filters.sortBy && filters.sortBy !== 'recent')}
+            className="min-w-[165px]"
+          />
 
           {isFiltered && (
             <button

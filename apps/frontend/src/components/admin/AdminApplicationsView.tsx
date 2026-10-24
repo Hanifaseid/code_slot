@@ -15,6 +15,7 @@ import {
   Download
 } from 'lucide-react';
 import { JobApplicationRecord, ApplicationStage } from '../../types/admin';
+import { CustomFilterDropdown, DropdownOption } from '../CustomFilterDropdown';
 
 interface AdminApplicationsViewProps {
   applications: JobApplicationRecord[];
@@ -35,6 +36,13 @@ export const AdminApplicationsView: React.FC<AdminApplicationsViewProps> = ({
     const list = Array.from(new Set(applications.map((a) => a.company)));
     return ['all', ...list];
   }, [applications]);
+
+  const companyOptions = useMemo<DropdownOption[]>(() => {
+    return companies.map((c) => ({
+      value: c,
+      label: c === 'all' ? 'All Companies' : c,
+    }));
+  }, [companies]);
 
   const filteredApplications = useMemo(() => {
     return applications.filter((app) => {
@@ -122,17 +130,14 @@ export const AdminApplicationsView: React.FC<AdminApplicationsViewProps> = ({
         </div>
 
         <div className="sm:col-span-4">
-          <select
+          <CustomFilterDropdown
+            id="admin-filter-company"
             value={selectedCompany}
-            onChange={(e) => setSelectedCompany(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 font-medium hover:border-orange-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 accent-orange-500 transition-all cursor-pointer"
-          >
-            {companies.map((c) => (
-              <option key={c} value={c}>
-                {c === 'all' ? 'All Companies' : c}
-              </option>
-            ))}
-          </select>
+            onChange={(val) => setSelectedCompany(val)}
+            options={companyOptions}
+            isActive={selectedCompany !== 'all'}
+            className="w-full"
+          />
         </div>
       </div>
 
