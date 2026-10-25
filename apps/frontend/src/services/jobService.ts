@@ -1055,11 +1055,12 @@ function normalizeArbeitnowJob(raw: any, index: number): Job {
 /**
  * Live fetcher for WeWorkRemotely tech feeds (proxied via CodeSlot backend to prevent browser CORS blocks)
  */
-async function fetchWeWorkRemotelyJobs(): Promise<Job[]> {
+async function fetchWeWorkRemotelyJobs(timestamp?: number): Promise<Job[]> {
   const jobs: Job[] = [];
 
   try {
-    const res = await apiClient.get<any[]>('/jobs/external/weworkremotely');
+    const query = timestamp ? `?_t=${timestamp}` : '';
+    const res = await apiClient.get<any[]>(`/jobs/external/weworkremotely${query}`);
     if (res.success && Array.isArray(res.data) && res.data.length > 0) {
       res.data.forEach((item: any, idx: number) => {
         let rawTitle = String(item.title || 'Software Engineer');
@@ -1103,9 +1104,10 @@ async function fetchWeWorkRemotelyJobs(): Promise<Job[]> {
 /**
  * Live fetcher for WorkingNomads remote tech API (proxied via CodeSlot backend to prevent browser CORS blocks)
  */
-async function fetchWorkingNomadsJobs(): Promise<Job[]> {
+async function fetchWorkingNomadsJobs(timestamp?: number): Promise<Job[]> {
   try {
-    const res = await apiClient.get<any[]>('/jobs/external/workingnomads');
+    const query = timestamp ? `?_t=${timestamp}` : '';
+    const res = await apiClient.get<any[]>(`/jobs/external/workingnomads${query}`);
     if (!res.success || !Array.isArray(res.data)) return [];
     const data = res.data;
 
@@ -1468,7 +1470,7 @@ export async function fetchRealJobs(forceRefresh: boolean = false): Promise<Job[
       fetchWeWorkRemotelyJobs(timestamp),
 
       // 11. WorkingNomads Global Tech API (Proxied through backend)
-      fetchWorkingNomadsJobs(),
+      fetchWorkingNomadsJobs(timestamp),
 
       // 12. Jobicy Regional Tech Feeds (Europe, UK, APAC, LATAM, Canada)
       fetchJobicyRegionalFeeds(timestamp)
