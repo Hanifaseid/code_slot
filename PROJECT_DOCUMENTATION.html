@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CodeSlot: System Requirements Specification & Architecture Documentation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --primary: #1e3a8a;
+      --primary-accent: #2563eb;
+      --primary-light: #eff6ff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border: #cbd5e1;
+      --border-light: #e2e8f0;
+      --bg-subtle: #f8fafc;
+      --code-bg: #0f172a;
+      --code-text: #f1f5f9;
+      --success-bg: #ecfdf5;
+      --success-border: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text-main);
+      background: #ffffff;
+      line-height: 1.6;
+      font-size: 10.5pt;
+      padding: 0;
+    }
+
+    /* Print Setup */
+    @page {
+      size: A4;
+      margin: 20mm 16mm 22mm 16mm;
+      @bottom-right {
+        content: counter(page);
+        font-size: 8.5pt;
+        color: var(--text-muted);
+      }
+    }
+
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .page-break-before {
+        page-break-before: always;
+      }
+      .no-break {
+        page-break-inside: avoid;
+      }
+      h2 {
+        page-break-before: always;
+      }
+      h2:first-of-type {
+        page-break-before: auto;
+      }
+      table, pre, .diagram-container, .alert {
+        page-break-inside: avoid;
+      }
+    }
+
+    /* Cover Page */
+    .cover-page {
+      page-break-after: always;
+      height: 96vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 20px;
+      border: 3px double #1e3a8a;
+      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 60%, #eff6ff 100%);
+      box-sizing: border-box;
+    }
+
+    .cover-header {
+      border-bottom: 2px solid var(--primary-accent);
+      padding-bottom: 24px;
+    }
+
+    .cover-org {
+      font-size: 11pt;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--primary-accent);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .cover-program {
+      font-size: 13pt;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .cover-body {
+      margin: 40px 0;
+    }
+
+    .cover-title {
+      font-size: 26pt;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+
+    .cover-subtitle {
+      font-size: 13pt;
+      font-weight: 500;
+      color: #334155;
+      line-height: 1.5;
+      max-width: 650px;
+      margin-bottom: 30px;
+    }
+
+    .cover-badge-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: #e0e7ff;
+      color: #3730a3;
+      border-radius: 9999px;
+      font-size: 9pt;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .badge.verified {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .cover-meta-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--primary-accent);
+      border-radius: 8px;
+      padding: 20px 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      row-gap: 10px;
+      font-size: 10.5pt;
+    }
+
+    .meta-label {
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 9pt;
+    }
+
+    .meta-value {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .cover-footer {
+      border-top: 1px solid var(--border-light);
+      padding-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9pt;
+      color: var(--text-muted);
+    }
+
+    /* Document Body Typography */
+    .document-body {
+      padding: 10px 0;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--primary);
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    h1 {
+      font-size: 20pt;
+      margin: 20px 0 14px 0;
+      border-bottom: 2px solid var(--primary-accent);
+      padding-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 15pt;
+      margin: 32px 0 12px 0;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+      color: var(--primary);
+    }
+
+    h3 {
+      font-size: 12pt;
+      margin: 22px 0 8px 0;
+      color: #1e40af;
+    }
+
+    h4 {
+      font-size: 11pt;
+      margin: 16px 0 6px 0;
+      color: #334155;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #1e293b;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin: 10px 0 14px 22px;
+      color: #1e293b;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    strong {
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 22px 0;
+      font-size: 9pt;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+      text-align: left;
+      padding: 9px 12px;
+      border-bottom: 2px solid var(--border);
+      font-size: 8.5pt;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-light);
+      color: #334155;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+
+    /* Code Blocks */
+    pre {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 8pt;
+      padding: 14px 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 14px 0 18px 0;
+      line-height: 1.45;
+      border: 1px solid #1e293b;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 8.5pt;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border: none;
+      font-size: 8pt;
+    }
+
+    /* Alerts and Blockquotes */
+    .alert {
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin: 16px 0;
+      border-left: 4px solid;
+      background: #f8fafc;
+      font-size: 9.5pt;
+    }
+
+    .alert-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-size: 9.5pt;
+    }
+
+    .alert-note {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      color: #1e40af;
+    }
+
+    .alert-tip {
+      background: #ecfdf5;
+      border-color: #10b981;
+      color: #065f46;
+    }
+
+    .alert-important {
+      background: #fef2f2;
+      border-color: #ef4444;
+      color: #991b1b;
+    }
+
+    .alert-warning {
+      background: #fffbeb;
+      border-color: #f59e0b;
+      color: #92400e;
+    }
+
+    .custom-quote {
+      border-left: 3px solid #94a3b8;
+      padding: 8px 16px;
+      margin: 14px 0;
+      font-style: italic;
+      color: #475569;
+      background: #f8fafc;
+    }
+
+    /* Diagrams */
+    .diagram-container {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 16px 0 20px 0;
+    }
+
+    .diagram-badge {
+      font-size: 8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--primary-accent);
+      margin-bottom: 8px;
+    }
+
+    .mermaid-code {
+      background: #ffffff;
+      color: #1e293b;
+      border: 1px solid var(--border-light);
+      font-size: 7.5pt;
+      padding: 10px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border-light);
+      margin: 24px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cover Page -->
+  <div class="cover-page">
+    <div class="cover-header">
+      <div class="cover-org">Information Network Security Agency (INSA)</div>
+      <div class="cover-program">Capstone Engineering Defense & Certification</div>
+    </div>
+
+    <div class="cover-body">
+      <div class="cover-badge-row">
+        <span class="badge verified">✓ Production Verified & Tested</span>
+        <span class="badge">Full-Stack Monorepo</span>
+        <span class="badge">Academic Year 2026</span>
+      </div>
+
+      <h1 class="cover-title">CodeSlot</h1>
+      <p class="cover-subtitle">Enterprise Remote Tech Jobs Discovery Platform & AI Resume Studio Powered by Google Gemini 2.5 Flash</p>
+
+      <div class="cover-meta-card">
+        <div class="cover-meta-grid">
+          <div class="meta-label">Project Title:</div>
+          <div class="meta-value">CodeSlot System Requirements & Architecture Specification</div>
+
+          <div class="meta-label">Student / Author:</div>
+          <div class="meta-value"><strong>Hanifa Seid</strong></div>
+
+          <div class="meta-label">Candidate ID:</div>
+          <div class="meta-value"><strong>CTC-1646-26</strong></div>
+
+          <div class="meta-label">Repository:</div>
+          <div class="meta-value"><code>codeslot-monorepo</code></div>
+
+          <div class="meta-label">Academic Program:</div>
+          <div class="meta-value">INSA Final Capstone Project</div>
+
+          <div class="meta-label">Document Version:</div>
+          <div class="meta-value">v2.1.0 — Clean Technical Documentation</div>
+
+          <div class="meta-label">Verification:</div>
+          <div class="meta-value">30 / 30 Endpoints Passed (100% Automated Coverage)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <div>Official Technical Specification Document</div>
+      <div>Confidential & Academic Submission © 2026 Hanifa Seid</div>
+    </div>
+  </div>
+
+  <!-- Document Body -->
+  <div class="document-body">
+    <h1>📘 CodeSlot: Enterprise Remote Tech Jobs Discovery &amp; AI Resume Studio</h1>
+<h2>Comprehensive System Requirements Specification &amp; Technical Architecture Documentation</h2>
+<hr>
+<h3>🎓 Academic Submission Information</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Metadata Field</th>
+<th align="left">Specification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Project Title</strong></td>
+<td align="left"><strong>CodeSlot — Remote Tech Jobs Discovery &amp; AI Resume Studio</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>Academic Program</strong></td>
+<td align="left"><strong>INSA Final Capstone Project</strong> (Information Network Security Agency)</td>
+</tr>
+<tr>
+<td align="left"><strong>Student / Author</strong></td>
+<td align="left"><strong>Hanifa Seid</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>Candidate ID / CTC</strong></td>
+<td align="left"><strong>CTC-1646-26</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>Project Repository</strong></td>
+<td align="left"><code>codeslot-monorepo</code> (Full-Stack Monorepo)</td>
+</tr>
+<tr>
+<td align="left"><strong>Academic Year</strong></td>
+<td align="left"><strong>2026</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>Project Status</strong></td>
+<td align="left"><strong>Production-Ready &amp; Fully Verified</strong></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>📑 Table of Contents</h2>
+<ol>
+<li><a href="#1-executive-summary--problem-statement">Executive Summary &amp; Problem Statement</a></li>
+<li><a href="#2-system-scope-objectives--stakeholder-profiles">System Scope, Objectives &amp; Stakeholder Profiles</a></li>
+<li><a href="#3-comprehensive-system-requirements-specification-srs">Comprehensive System Requirements Specification (SRS)</a><ul>
+<li>3.1 Functional Requirements (FR-01 – FR-15)</li>
+<li>3.2 Non-Functional Requirements (NFR-01 – NFR-10)</li>
+<li>3.3 System Constraints, Assumptions &amp; Dependencies</li>
+</ul>
+</li>
+<li><a href="#4-monorepo-system-architecture--component-design">Monorepo System Architecture &amp; Component Design</a><ul>
+<li>4.1 High-Level Architecture Diagram</li>
+<li>4.2 Monorepo Inter-Package Dependency Graph &amp; Folder Hierarchy</li>
+<li>4.3 End-to-End Sequence Workflows</li>
+</ul>
+</li>
+<li><a href="#5-technology-stack--justification-matrix">Technology Stack &amp; Justification Matrix</a></li>
+<li><a href="#6-database-design--data-models-prisma-orm">Database Design &amp; Data Models (Prisma ORM)</a><ul>
+<li>6.1 Entity-Relationship (ER) Diagram</li>
+<li>6.2 Data Schema Specifications &amp; Relational Constraints</li>
+</ul>
+</li>
+<li><a href="#7-api-design--rest-endpoints-specification">API Design &amp; REST Endpoints Specification</a><ul>
+<li>7.1 Authentication &amp; Profile (<code>/api/auth</code>)</li>
+<li>7.2 Remote Jobs Portal (<code>/api/jobs</code>)</li>
+<li>7.3 AI Resume Studio (<code>/api/resume</code>)</li>
+<li>7.4 Admin OS &amp; Recruitment Telemetry (<code>/api/admin</code>)</li>
+<li>7.5 System Health (<code>/api/health</code>)</li>
+</ul>
+</li>
+<li><a href="#8-generative-ai-integration--algorithmic-heuristic-fallback">Generative AI Integration &amp; Algorithmic Heuristic Fallback</a><ul>
+<li>8.1 Primary Engine: Google Gemini 2.5 Flash</li>
+<li>8.2 The Google X-Y-Z Accomplishment Optimization Model</li>
+<li>8.3 Secondary Engine: Deterministic Heuristic Fallback</li>
+</ul>
+</li>
+<li><a href="#9-security-rbac--telemetry-auditing">Security, RBAC &amp; Telemetry Auditing</a><ul>
+<li>9.1 Authentication &amp; Authorization Pipeline</li>
+<li>9.2 Input Sanitization &amp; Boundary Validation</li>
+<li>9.3 Immutable Audit Logging</li>
+</ul>
+</li>
+<li><a href="#10-quality-assurance-testing--verification">Quality Assurance, Testing &amp; Verification</a><ul>
+<li>10.1 Automated End-to-End Test Suite Verification</li>
+<li>10.2 Type Safety &amp; Linting Verification</li>
+</ul>
+</li>
+<li><a href="#11-installation-environment-setup--deployment">Installation, Environment Setup &amp; Deployment</a><ul>
+<li>11.1 System Prerequisites</li>
+<li>11.2 Step-by-Step Local Deployment</li>
+<li>11.3 Containerized Execution (Docker Compose)</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2>1. Executive Summary &amp; Problem Statement</h2>
+<h3>1.1 The Industry Challenge</h3>
+<p>In the contemporary global technology ecosystem, distributed and remote engineering has transitioned from an emergency arrangement into the standard operational paradigm for elite software organizations worldwide. However, the international hiring pipeline suffers from three critical systemic bottlenecks:</p>
+<ol>
+<li><strong>Low Signal-to-Noise in Job Discovery</strong>: Mainstream employment aggregators (e.g., LinkedIn, Indeed) are saturated with ambiguous &quot;hybrid&quot; listings, unverified postings, localized compensation penalties, and recruiter spam. Software engineers outside North America and Western Europe expend countless hours searching for genuine, 100% remote positions that recruit globally without geographical wage suppression.</li>
+<li><strong>The ATS (Applicant Tracking System) Black Hole</strong>: Over 75% of qualified engineering resumes are automatically eliminated by automated ATS parsers (such as Workday, Greenhouse, and Lever) prior to human engineering review. This occurs because candidate resumes lack exact keyword alignment, fail to articulate measurable business impacts, or employ multi-column layouts that break legacy text extractors.</li>
+<li><strong>Fragmented Application Workflows</strong>: Developers currently discover openings on one platform, manually customize resumes in disparate word processors, guess at missing keywords, and track application milestones in disconnected spreadsheets, causing immense cognitive overhead and missed career opportunities.</li>
+</ol>
+<h3>1.2 The CodeSlot Solution</h3>
+<p><strong>CodeSlot</strong> is an integrated, full-stack remote engineering discovery and generative AI career acceleration platform. CodeSlot establishes a direct bridge between global software developers and verified, top-tier remote engineering opportunities while equipping candidates with an in-browser <strong>AI Resume Studio</strong> powered by <strong>Google Gemini 2.5 Flash</strong>.</p>
+<p>CodeSlot delivers:</p>
+<ul>
+<li><strong>Verified Worldwide Remote Roles</strong>: A curated catalog spanning Backend, Frontend, Full Stack, DevOps/Cloud, AI/ML, Mobile, and Security engineering roles with transparent USD compensation tiers.</li>
+<li><strong>Automated Resume-to-Job Matching</strong>: Sub-second semantic matching calculating ATS compatibility scores (0–100%) and surfacing keyword deficits.</li>
+<li><strong>Generative AI Resume Tailoring</strong>: Instant transformation of authentic engineering accomplishments using the <strong>Google X-Y-Z formula</strong> (<em>&quot;Accomplished [X], as measured by [Y], by doing [Z]&quot;</em>).</li>
+<li><strong>Pixel-Perfect Typographic PDF Generation</strong>: High-density, machine-readable resume layouts across 7 professional templates without watermarks, third-party subscriptions, or paid APIs.</li>
+<li><strong>Recruiter Admin OS (Kanban ATS)</strong>: An administrative control center enabling recruitment managers to visualize pipeline flow across 5 stages (<em>Applied, Screening, Interview, Offer, Rejected</em>) with real-time audit logging and platform telemetry.</li>
+</ul>
+<hr>
+<h2>2. System Scope, Objectives &amp; Stakeholder Profiles</h2>
+<h3>2.1 Project Objectives</h3>
+<ul>
+<li><strong>Zero API Drift</strong>: Enforce unified Zod validation schemas across both frontend and backend within a pnpm monorepo.</li>
+<li><strong>Sub-1.5s Generative Turnaround</strong>: Leverage Gemini 2.5 Flash for high-velocity resume synthesis and bullet-point enhancement.</li>
+<li><strong>100% Resilience Guarantee</strong>: Deliver a deterministic heuristic fallback engine to guarantee uninterrupted operation even during third-party API outages or quota exhaustion.</li>
+<li><strong>Enterprise-Grade Security</strong>: Implement defense-in-depth security with stateless JWT authentication, Role-Based Access Control (RBAC), Helmet security headers, CORS origin restrictions, and immutable audit logs.</li>
+<li><strong>Academic &amp; Production Excellence</strong>: Achieve 100% pass rates across all 30 REST endpoints with complete OpenAPI 3.0 documentation.</li>
+</ul>
+<h3>2.2 Stakeholder Profiles</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Stakeholder Role</th>
+<th align="left">Key Objectives &amp; Primary Use Cases</th>
+<th align="left">Permissions Tier</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Candidate / Software Engineer</strong></td>
+<td align="left">Searches remote tech jobs, applies seniority filters, bookmarks roles, tailors resume with AI, exports print-ready PDFs, submits applications.</td>
+<td align="left">Standard Authenticated (<code>candidate</code>)</td>
+</tr>
+<tr>
+<td align="left"><strong>Recruiter / Hiring Manager</strong></td>
+<td align="left">Posts verified engineering listings, reviews applicant submissions, inspects ATS match scores, manages Kanban stages.</td>
+<td align="left">Elevated Recruiter (<code>recruiter</code>)</td>
+</tr>
+<tr>
+<td align="left"><strong>System Administrator</strong></td>
+<td align="left">Monitors system health, user directory, activity streams, AI session logs, manages platform broadcasts, invalidates telemetry caches.</td>
+<td align="left">Full Administrative (<code>admin</code>)</td>
+</tr>
+<tr>
+<td align="left"><strong>Anonymous Visitor</strong></td>
+<td align="left">Browses public job listings, reviews platform features, runs demo persona switches.</td>
+<td align="left">Unauthenticated (<code>public</code>)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>3. Comprehensive System Requirements Specification (SRS)</h2>
+<h3>3.1 Functional Requirements (FR)</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Requirement ID</th>
+<th align="left">Module</th>
+<th align="left">Priority</th>
+<th align="left">Actor</th>
+<th align="left">Functional Description</th>
+<th align="left">Acceptance Criteria</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>FR-01</strong></td>
+<td align="left"><strong>Auth</strong></td>
+<td align="left">High</td>
+<td align="left">Visitor / Candidate</td>
+<td align="left">System shall allow candidate registration with email, password, seniority level (<code>junior</code>, <code>intermediate</code>, <code>senior</code>), and skill tags.</td>
+<td align="left">Creates <code>User</code> record with hashed password; returns JWT token and standard user envelope.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-02</strong></td>
+<td align="left"><strong>Auth</strong></td>
+<td align="left">High</td>
+<td align="left">Candidate / Admin</td>
+<td align="left">System shall authenticate credentials via email and password, issuing a stateless signed JWT token.</td>
+<td align="left">Valid credentials return 200 OK + JWT; invalid credentials return 401 Unauthorized with descriptive error.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-03</strong></td>
+<td align="left"><strong>Auth</strong></td>
+<td align="left">Medium</td>
+<td align="left">Evaluator / Visitor</td>
+<td align="left">System shall provide a 1-click Demo Persona Switch (<code>candidate</code>, <code>recruiter</code>, <code>admin</code>) to facilitate rapid evaluation.</td>
+<td align="left">Automatically provisions/switches session context to the selected persona without requiring manual credential entry.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-04</strong></td>
+<td align="left"><strong>Jobs</strong></td>
+<td align="left">High</td>
+<td align="left">Public / Candidate</td>
+<td align="left">System shall list, paginate, and search verified remote engineering positions across titles, companies, and tags.</td>
+<td align="left">Returns JSON array of jobs matching search query, filtered by seniority and category in $&lt; 100\text{ms}$.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-05</strong></td>
+<td align="left"><strong>Jobs</strong></td>
+<td align="left">High</td>
+<td align="left">Candidate</td>
+<td align="left">System shall provide instant seniority filtering (Junior, Intermediate, Senior) with instant UI reactivity.</td>
+<td align="left">Selecting a seniority chip filters the catalog immediately without page reload or state corruption.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-06</strong></td>
+<td align="left"><strong>Jobs</strong></td>
+<td align="left">Medium</td>
+<td align="left">Candidate</td>
+<td align="left">System shall enable authenticated users to bookmark/save target jobs with cloud persistence.</td>
+<td align="left">POST to <code>/api/jobs/:id/save</code> toggles <code>SavedJob</code> record; state persists across browser refreshes.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-07</strong></td>
+<td align="left"><strong>Jobs</strong></td>
+<td align="left">High</td>
+<td align="left">Candidate</td>
+<td align="left">System shall allow candidates to submit job applications with tailored resume version, match score, and salary expectation.</td>
+<td align="left">Creates <code>JobApplication</code> with status <code>applied</code>; increments application counter and logs activity.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-08</strong></td>
+<td align="left"><strong>Resume</strong></td>
+<td align="left">High</td>
+<td align="left">Candidate</td>
+<td align="left">System shall provide an interactive resume editor with live typography preview and cloud state synchronization.</td>
+<td align="left">Edits to contact info, experience, education, and skills sync to <code>/api/resume/save</code> and render in real time.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-09</strong></td>
+<td align="left"><strong>Resume</strong></td>
+<td align="left">High</td>
+<td align="left">Candidate</td>
+<td align="left">System shall integrate Google Gemini 2.5 Flash to automatically tailor candidate resumes to any selected job description.</td>
+<td align="left">Generates tailored resume JSON incorporating target job keywords and the Google X-Y-Z formula in $&lt; 2.5\text{s}$.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-10</strong></td>
+<td align="left"><strong>Resume</strong></td>
+<td align="left">High</td>
+<td align="left">Candidate</td>
+<td align="left">System shall implement a deterministic heuristic fallback engine if Gemini API key is absent or network fails.</td>
+<td align="left">Automatically tokenizes job keywords, re-orders skills, recalculates ATS score, and alerts user via subtle toast notification.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-11</strong></td>
+<td align="left"><strong>Resume</strong></td>
+<td align="left">Medium</td>
+<td align="left">Candidate</td>
+<td align="left">System shall support 7 typographic resume templates (ATS Compact, Ivy Classic, Executive Modern, Tech Minimalist, Split Sidebar, Nordic Clean, Vibrant Startup).</td>
+<td align="left">Switching template instantly updates DOM typography, column flow, and spacing while preserving content integrity.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-12</strong></td>
+<td align="left"><strong>Resume</strong></td>
+<td align="left">High</td>
+<td align="left">Candidate</td>
+<td align="left">System shall generate vector-sharp, print-ready, zero-watermark PDFs using browser <code>@media print</code> CSS engine.</td>
+<td align="left">Triggering &quot;Export PDF&quot; isolates resume canvas, strips navigation chrome, and prints flawless multi-page documents.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-13</strong></td>
+<td align="left"><strong>Admin</strong></td>
+<td align="left">High</td>
+<td align="left">Admin / Recruiter</td>
+<td align="left">System shall provide a visual Kanban Application Tracking System (ATS) across 5 recruitment stages.</td>
+<td align="left">Dragging or clicking a card transitions stage (<code>applied</code> $\rightarrow$ <code>screening</code> $\rightarrow$ <code>interview</code> $\rightarrow$ <code>offer</code> $\rightarrow$ <code>rejected</code>) with atomic DB updates.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-14</strong></td>
+<td align="left"><strong>Admin</strong></td>
+<td align="left">High</td>
+<td align="left">Administrator</td>
+<td align="left">System shall maintain real-time telemetry: KPI dashboard, live user activity stream, and AI session history.</td>
+<td align="left">Displays total users, active jobs, applications, average ATS uplift, and an append-only event stream.</td>
+</tr>
+<tr>
+<td align="left"><strong>FR-15</strong></td>
+<td align="left"><strong>Admin</strong></td>
+<td align="left">Medium</td>
+<td align="left">Administrator</td>
+<td align="left">System shall enable global announcement broadcasts displayed across the candidate portal header.</td>
+<td align="left">Publishing a message updates <code>/api/admin/broadcast</code>; banner immediately appears on candidate view.</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>3.2 Non-Functional Requirements (NFR)</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Requirement ID</th>
+<th align="left">Quality Attribute</th>
+<th align="left">Target Metric / Requirement Specification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>NFR-01</strong></td>
+<td align="left"><strong>Performance (API Latency)</strong></td>
+<td align="left">All non-AI REST API endpoints must respond within $\le 100\text{ms}$ at 95th percentile under standard development load.</td>
+</tr>
+<tr>
+<td align="left"><strong>NFR-02</strong></td>
+<td align="left"><strong>Performance (AI Turnaround)</strong></td>
+<td align="left">AI resume tailoring requests through Gemini 2.5 Flash must complete in $\le 2.5\text{s}$; heuristic fallback must execute in $\le 50\text{ms}$.</td>
+</tr>
+<tr>
+<td align="left"><strong>NFR-03</strong></td>
+<td align="left"><strong>Security (Data at Rest &amp; Transit)</strong></td>
+<td align="left">All passwords must be cryptographically hashed using Node.js crypto salt/digest; all communications must use HTTPS/TLS; tokens must expire after 7 days.</td>
+</tr>
+<tr>
+<td align="left"><strong>NFR-04</strong></td>
+<td align="left"><strong>Security (RBAC Enforcement)</strong></td>
+<td align="left">Elevated administrative routes (<code>/api/admin/*</code>) must strictly verify JWT token and reject unauthorized roles with <code>403 Forbidden</code>.</td>
+</tr>
+<tr>
+<td align="left"><strong>NFR-05</strong></td>
+<td align="left"><strong>Reliability &amp; Fault Tolerance</strong></td>
+<td align="left">The system must guarantee zero unhandled rejections. Third-party AI API failures must trigger the heuristic fallback engine with 0% user-facing downtime.</td>
+</tr>
+<tr>
+<td align="left"><strong>NFR-06</strong></td>
+<td align="left"><strong>Availability &amp; Health Checks</strong></td>
+<td align="left">Backend must expose <code>/health</code> and <code>/api/health</code> providing active memory telemetry and PostgreSQL connection status.</td>
+</tr>
+<tr>
+<td align="left"><strong>NFR-07</strong></td>
+<td align="left"><strong>ATS Machine Readability</strong></td>
+<td align="left">Generated ATS Compact resume templates must strictly follow single-column, standard heading hierarchies (<code>EXPERIENCE</code>, <code>EDUCATION</code>, <code>SKILLS</code>) parseable by automated ATS systems.</td>
+</tr>
+<tr>
+<td align="left"><strong>NFR-08</strong></td>
+<td align="left"><strong>Type Safety &amp; Schema Integrity</strong></td>
+<td align="left">100% of API inputs and outputs must be validated by Zod schemas shared between frontend and backend in <code>@code-slot/shared</code>.</td>
+</tr>
+<tr>
+<td align="left"><strong>NFR-09</strong></td>
+<td align="left"><strong>Maintainability &amp; Documentation</strong></td>
+<td align="left">Complete OpenAPI 3.0 / Swagger specification accessible at <code>/api/docs</code> with live interactive request execution.</td>
+</tr>
+<tr>
+<td align="left"><strong>NFR-10</strong></td>
+<td align="left"><strong>Portability &amp; Containerization</strong></td>
+<td align="left">Entire application stack must be reproducible in one command via Docker Compose (<code>pnpm docker:up</code>).</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>3.3 System Constraints, Assumptions &amp; Dependencies</h3>
+<ul>
+<li><strong>Hardware Constraints</strong>: Runs efficiently on standard workstation hardware (minimum 4GB RAM, 2 CPU cores).</li>
+<li><strong>Runtime Environment</strong>: Requires Node.js $\ge 20.0.0$, pnpm $\ge 10.0.0$, and PostgreSQL $\ge 16.0$.</li>
+<li><strong>Browser Compatibility</strong>: Fully supported on modern evergreen browsers (Google Chrome $\ge 120$, Microsoft Edge $\ge 120$, Mozilla Firefox $\ge 120$, Apple Safari $\ge 17$).</li>
+<li><strong>Zero Third-Party PDF Dependency</strong>: Relies exclusively on native client-side CSS print media engines, eliminating external SaaS rendering costs and data transmission privacy concerns.</li>
+</ul>
+<hr>
+<h2>4. Monorepo System Architecture &amp; Component Design</h2>
+<p>CodeSlot is structured as an enterprise <strong>pnpm monorepo</strong> with clear separation of concerns, strict package boundaries, and shared contract validation.</p>
+<h3>4.1 High-Level Architecture Diagram</h3>
+<div class="diagram-container"><div class="diagram-badge">System Architectural Diagram / Flow Model</div><pre class="mermaid-code">graph TD
+    subgraph ClientTier [&quot;Client Tier (Browser SPA - React 19 + Vite 8 + Tailwind v4)&quot;]
+        UI[&quot;React 19 Shell &amp; State Provider&quot;]
+        JobsUI[&quot;Remote Jobs Portal (Filters &amp; Search)&quot;]
+        StudioUI[&quot;AI Resume Studio (7 Templates &amp; ATS Gauge)&quot;]
+        AdminUI[&quot;Recruiter Admin OS &amp; Kanban ATS&quot;]
+        ClientService[&quot;Typed API Client (Axios/Fetch + JWT Injector)&quot;]
+        
+        UI --&gt; JobsUI
+        UI --&gt; StudioUI
+        UI --&gt; AdminUI
+        JobsUI --&gt; ClientService
+        StudioUI --&gt; ClientService
+        AdminUI --&gt; ClientService
+    end
+
+    subgraph ContractLayer [&quot;Shared Contract Layer (@code-slot/shared)&quot;]
+        ZodSchemas[&quot;Zod Validation Schemas (User, Job, Resume, App)&quot;]
+        TSInterfaces[&quot;Inferred TypeScript Interfaces &amp; Types&quot;]
+        ZodSchemas -.-&gt; TSInterfaces
+    end
+
+    subgraph GatewayTier [&quot;API &amp; Middleware Tier (Express 4.21)&quot;]
+        Router[&quot;Express REST Router&quot;]
+        CorsHelmet[&quot;Security Guard (Helmet + CORS)&quot;]
+        AuthGuard[&quot;JWT Verification &amp; RBAC Guard&quot;]
+        ZodValidator[&quot;Zod Request Interceptor&quot;]
+        SwaggerDocs[&quot;OpenAPI 3.0 Registry (/api/docs)&quot;]
+
+        CorsHelmet --&gt; Router
+        Router --&gt; AuthGuard
+        AuthGuard --&gt; ZodValidator
+    end
+
+    subgraph DomainModules [&quot;Modular Domain Services (Node.js 20+)&quot;]
+        AuthModule[&quot;Auth &amp; Profile Module (/api/auth)&quot;]
+        JobsModule[&quot;Jobs Discovery &amp; Apply Module (/api/jobs)&quot;]
+        ResumeModule[&quot;Resume Storage &amp; Optimization (/api/resume)&quot;]
+        AdminModule[&quot;Admin Telemetry &amp; Kanban Module (/api/admin)&quot;]
+        HealthModule[&quot;System &amp; Database Health (/api/health)&quot;]
+    end
+
+    subgraph DataAITier [&quot;Data &amp; AI Tier&quot;]
+        PrismaClient[&quot;Prisma ORM 6.4 Client&quot;]
+        Postgres[(PostgreSQL 16 Database)]
+        GeminiEngine[&quot;Google Gemini 2.5 Flash Engine&quot;]
+        HeuristicEngine[&quot;Deterministic Heuristic Fallback Engine&quot;]
+    end
+
+    ClientService --&gt;|HTTPS / JSON REST| Router
+    ContractLayer --&gt;|Type Import| ClientTier
+    ContractLayer --&gt;|Schema Validation| GatewayTier
+    ZodValidator --&gt; DomainModules
+    DomainModules --&gt; PrismaClient
+    PrismaClient --&gt; Postgres
+    StudioUI -.-&gt;|Direct or Server Proxy| GeminiEngine
+    StudioUI -.-&gt;|Fallback Execution| HeuristicEngine</pre></div>
+<hr>
+<h3>4.2 Monorepo Inter-Package Dependency Graph &amp; Folder Hierarchy</h3>
+<pre><code>codeslot-monorepo/
+│
+├── 📦 packages/
+│   ├── shared/                      # [THE CONTRACT LAYER]
+│   │   ├── package.json             # Exposes @code-slot/shared
+│   │   └── src/index.ts             # Central Zod schemas &amp; TypeScript types (User, Job, Resume, App)
+│   └── typescript-config/           # [BASE COMPILER SETTINGS]
+│       └── base.json                # Shared tsconfig extended by all sub-packages
+│
+├── 🌐 apps/frontend/                # [CLIENT TIER: React 19 + Vite + Tailwind v4]
+│   ├── src/
+│   │   ├── App.tsx                  # Root state machine, hash router, and session provider
+│   │   ├── types/                   # Re-exports &amp; client-only view models (extends @code-slot/shared)
+│   │   ├── services/
+│   │   │   ├── apiClient.ts         # Axios/Fetch HTTP wrapper with Bearer token injector
+│   │   │   ├── jobService.ts        # Connects JobsPortal.tsx -&gt; Backend /api/jobs
+│   │   │   ├── aiResumeService.ts   # Connects ResumeStudio.tsx -&gt; Gemini AI &amp; Backend /api/resume
+│   │   │   └── adminService.ts      # Connects AdminPortal.tsx -&gt; Backend /api/admin
+│   │   └── components/
+│   │       ├── JobsPortal.tsx       # Job search, multi-tag filtering, seniority selector
+│   │       ├── JobDetailPage.tsx    # Detailed view &amp; application submission modal
+│   │       ├── resume/
+│   │       │   ├── ResumeStudio.tsx # Primary AI editor, ATS score gauge, and controls
+│   │       │   └── templates/       # 7 Typographic templates (ATS Compact, Ivy Classic, etc.)
+│   │       └── admin/
+│   │           ├── AdminPortal.tsx  # Admin OS shell and tab navigation
+│   │           ├── AdminOverviewView.tsx    # Live KPI summary cards
+│   │           ├── AdminApplicationsView.tsx# Recruiter Kanban board (drag &amp; drop)
+│   │           └── AdminActivitiesView.tsx  # Real-time event audit stream
+│
+├── ⚙️ apps/backend/                 # [SERVER TIER: Node.js + Express 4.21 + Prisma]
+│   ├── prisma/
+│   │   └── schema.prisma            # PostgreSQL relational database models &amp; constraints
+│   └── src/
+│       ├── server.ts                # HTTP bootstrap &amp; graceful shutdown listeners
+│       ├── app.ts                   # Express middleware pipeline (Helmet, CORS, Rate-limit, JSON)
+│       ├── database/client.ts       # Singleton PrismaClient instance with connection pool
+│       ├── docs/swagger.ts          # OpenAPI registry converting Zod schemas to /api/docs
+│       ├── middleware/
+│       │   ├── auth.middleware.ts   # JWT verification &amp; RBAC guard (requireRole([&#39;admin&#39;]))
+│       │   └── validate.middleware.ts# Zod request body/query validation interceptor
+│       └── modules/                 # Modular Domain Layer (Routes -&gt; Controllers -&gt; Services)
+│           ├── auth/                # /api/auth (register, login, profile updates)
+│           ├── jobs/                # /api/jobs (catalog, seniority filter, apply, bookmark)
+│           ├── resume/              # /api/resume (cloud resume persistence &amp; AI proxy)
+│           ├── admin/               # /api/admin (stats, applications Kanban, user directory, audit)
+│           └── health/              # /health &amp; /api/health (DB and memory telemetry)
+│
+├── 🐳 infrastructure/               # [CONTAINERIZATION]
+│   └── docker-compose.yml           # Orchestrates Postgres 16, Backend API, and Frontend SPA
+│
+├── 🧪 test-all-endpoints.mjs        # [QUALITY ASSURANCE] 30 verified end-to-end integration tests
+└── 📄 package.json &amp; pnpm-workspace.yaml # Monorepo orchestration scripts (dev, build, test, lint)
+</code></pre>
+<hr>
+<h3>4.3 End-to-End Sequence Workflows</h3>
+<h4>Sequence 1: Job Discovery to AI Tailoring and Application Submission</h4>
+<div class="diagram-container"><div class="diagram-badge">System Architectural Diagram / Flow Model</div><pre class="mermaid-code">sequenceDiagram
+    autonumber
+    actor Dev as Candidate (Alex Mercer)
+    participant UI as CodeSlot Frontend
+    participant API as Express REST API
+    participant DB as PostgreSQL (Prisma)
+    participant AI as Google Gemini 2.5 Flash
+
+    Dev-&gt;&gt;UI: Filter jobs (Category: Backend, Seniority: Senior)
+    UI-&gt;&gt;API: GET /api/jobs?category=Backend&amp;experienceLevel=senior
+    API-&gt;&gt;DB: Query jobs WHERE category=&#39;Backend&#39;
+    DB--&gt;&gt;API: Return matched job catalog
+    API--&gt;&gt;UI: 200 OK (Job list JSON)
+
+    Dev-&gt;&gt;UI: Click &quot;Tailor Resume for Role&quot;
+    UI-&gt;&gt;AI: POST generateContent (Candidate resume + Job description)
+    Note over UI,AI: Gemini analyzes missing keywords &amp; Google X-Y-Z metrics
+    AI--&gt;&gt;UI: Return tailored resume JSON + ATS match breakdown
+    
+    Dev-&gt;&gt;UI: Select &quot;ATS Compact&quot; template &amp; click &quot;Apply Now&quot;
+    UI-&gt;&gt;API: POST /api/jobs/:id/apply (matchScore: 94%, resumeVersion)
+    API-&gt;&gt;DB: INSERT INTO job_applications &amp; activity_logs
+    DB--&gt;&gt;API: Application confirmed
+    API--&gt;&gt;UI: 200 OK (Stage: &#39;applied&#39;)
+    UI--&gt;&gt;Dev: Toast confirmation: &quot;Application Submitted Successfully!&quot;</pre></div>
+<h4>Sequence 2: Recruiter Kanban Application Stage Transition</h4>
+<div class="diagram-container"><div class="diagram-badge">System Architectural Diagram / Flow Model</div><pre class="mermaid-code">sequenceDiagram
+    autonumber
+    actor Recruiter as Hiring Director
+    participant AdminUI as Admin OS (Kanban ATS)
+    participant API as Express REST API
+    participant DB as PostgreSQL (Prisma)
+
+    Recruiter-&gt;&gt;AdminUI: Drag application card from &quot;Screening&quot; to &quot;Interview&quot;
+    AdminUI-&gt;&gt;API: PATCH /api/admin/applications/:id/stage { stage: &quot;interview&quot; }
+    Note over API: Verify JWT token has role &#39;admin&#39; or &#39;recruiter&#39;
+    API-&gt;&gt;DB: UPDATE job_applications SET stage=&#39;interview&#39;
+    API-&gt;&gt;DB: INSERT INTO audit_logs (adminEmail, action, target)
+    DB--&gt;&gt;API: Transaction committed successfully
+    API--&gt;&gt;AdminUI: 200 OK (Updated Application Entity)
+    AdminUI--&gt;&gt;Recruiter: UI snaps card into &quot;Interview&quot; column with instant visual feedback</pre></div>
+<hr>
+<h2>5. Technology Stack &amp; Justification Matrix</h2>
+<table>
+<thead>
+<tr>
+<th align="left">Architectural Layer</th>
+<th align="left">Selected Technology</th>
+<th align="left">Version</th>
+<th align="left">Engineering Rationale &amp; Justification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Workspace Architecture</strong></td>
+<td align="left"><strong>pnpm Workspaces</strong></td>
+<td align="left"><code>v10.33</code></td>
+<td align="left">Hard-linked dependency tree, zero duplicate packages across apps, 3x faster CI/CD build execution than standard npm.</td>
+</tr>
+<tr>
+<td align="left"><strong>Frontend Framework</strong></td>
+<td align="left"><strong>React</strong></td>
+<td align="left"><code>19.0.0</code></td>
+<td align="left">Concurrent rendering pipeline, predictable functional component lifecycle, robust client-side state handling.</td>
+</tr>
+<tr>
+<td align="left"><strong>Frontend Build Tooling</strong></td>
+<td align="left"><strong>Vite</strong></td>
+<td align="left"><code>8.3.0</code></td>
+<td align="left">Sub-50ms Hot Module Replacement (HMR), optimized Rollup tree-shaking production bundling.</td>
+</tr>
+<tr>
+<td align="left"><strong>Styling Engine</strong></td>
+<td align="left"><strong>Tailwind CSS</strong></td>
+<td align="left"><code>v4.3.0</code></td>
+<td align="left">Modern CSS compiler, zero runtime CSS overhead, native design tokens, precision <code>@media print</code> rules for PDF generation.</td>
+</tr>
+<tr>
+<td align="left"><strong>Icons &amp; Motion</strong></td>
+<td align="left"><strong>Lucide React + Motion</strong></td>
+<td align="left"><code>1.16</code> / <code>12.4</code></td>
+<td align="left">Accessible SVG iconography, fluid micro-interactions, hardware-accelerated transitions.</td>
+</tr>
+<tr>
+<td align="left"><strong>Generative AI Model</strong></td>
+<td align="left"><strong>Google Gemini 2.5 Flash</strong></td>
+<td align="left"><code>v1beta</code></td>
+<td align="left">Sub-1.5s latency, 1M context window, high instruction fidelity for JSON schema output without hallucinations.</td>
+</tr>
+<tr>
+<td align="left"><strong>Backend Runtime</strong></td>
+<td align="left"><strong>Node.js</strong></td>
+<td align="left"><code>20+ LTS</code></td>
+<td align="left">High-throughput asynchronous event-driven I/O with native ES modules support.</td>
+</tr>
+<tr>
+<td align="left"><strong>Language &amp; Typings</strong></td>
+<td align="left"><strong>TypeScript</strong></td>
+<td align="left"><code>5.7.3</code></td>
+<td align="left">End-to-end type safety spanning backend models, API contracts, and frontend components.</td>
+</tr>
+<tr>
+<td align="left"><strong>Web Server Framework</strong></td>
+<td align="left"><strong>Express</strong></td>
+<td align="left"><code>4.21.2</code></td>
+<td align="left">Robust, battle-tested HTTP middleware pipeline, modular routing, standardized error handling envelopes.</td>
+</tr>
+<tr>
+<td align="left"><strong>Database &amp; ORM</strong></td>
+<td align="left"><strong>PostgreSQL 16 + Prisma</strong></td>
+<td align="left"><code>6.4.1</code></td>
+<td align="left">Relational integrity, ACID compliance, automatic schema migration generation, and type-safe query client.</td>
+</tr>
+<tr>
+<td align="left"><strong>Contract Validation</strong></td>
+<td align="left"><strong>Zod</strong></td>
+<td align="left"><code>3.24.2</code></td>
+<td align="left">Runtime schema validation at boundaries; single source of truth for both types and input guards.</td>
+</tr>
+<tr>
+<td align="left"><strong>API Documentation</strong></td>
+<td align="left"><strong>OpenAPI 3.0 + Swagger</strong></td>
+<td align="left"><code>5.0.1</code></td>
+<td align="left">Auto-generated interactive API docs (<code>/api/docs</code>), making API exploration effortless for developers.</td>
+</tr>
+<tr>
+<td align="left"><strong>Security &amp; Logging</strong></td>
+<td align="left"><strong>Helmet, CORS, Pino</strong></td>
+<td align="left">Latest</td>
+<td align="left">HTTP security headers, origin protection, structured JSON telemetry logs.</td>
+</tr>
+<tr>
+<td align="left"><strong>Testing Engine</strong></td>
+<td align="left"><strong>Vitest 3.0 + Supertest</strong></td>
+<td align="left">Latest</td>
+<td align="left">High-velocity integration test execution verifying all 30 HTTP endpoints.</td>
+</tr>
+<tr>
+<td align="left"><strong>Containerization</strong></td>
+<td align="left"><strong>Docker + Compose</strong></td>
+<td align="left">Multi-stage</td>
+<td align="left">Reproducible dev and prod environments isolating Postgres, Express, and Vite/Nginx.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>6. Database Design &amp; Data Models (Prisma ORM)</h2>
+<p>CodeSlot utilizes <strong>PostgreSQL 16</strong> managed via <strong>Prisma ORM 6.4</strong>. The schema is optimized for relational integrity, foreign key cascade behaviors, and index-accelerated querying.</p>
+<h3>6.1 Entity-Relationship (ER) Diagram</h3>
+<div class="diagram-container"><div class="diagram-badge">System Architectural Diagram / Flow Model</div><pre class="mermaid-code">erDiagram
+    User ||--o{ SavedJob : &quot;saves&quot;
+    User ||--o{ JobApplication : &quot;submits&quot;
+    User ||--o{ Resume : &quot;owns&quot;
+    User ||--o{ AISession : &quot;executes&quot;
+    Job ||--o{ SavedJob : &quot;saved_by&quot;
+    Job ||--o{ JobApplication : &quot;receives&quot;
+
+    User {
+        string id PK &quot;cuid/uuid&quot;
+        string email UK &quot;unique index&quot;
+        string passwordHash &quot;crypto digest&quot;
+        string name &quot;full name&quot;
+        string role &quot;candidate | recruiter | admin&quot;
+        string status &quot;active | verified | idle | suspended&quot;
+        string plan &quot;Free | Pro Dev | Enterprise&quot;
+        string experienceLevel &quot;junior | intermediate | senior&quot;
+        string[] skills &quot;scalar list&quot;
+        int resumeScore &quot;0-100&quot;
+        datetime createdAt &quot;default now&quot;
+    }
+
+    Job {
+        string id PK &quot;cuid/uuid&quot;
+        string title &quot;job title&quot;
+        string companyName &quot;hiring company&quot;
+        string category &quot;Backend | Frontend | Fullstack...&quot;
+        string specialization &quot;domain tag&quot;
+        string jobType &quot;Full-time | Contract | Part-time&quot;
+        string candidateRequiredLocation &quot;Worldwide | Americas | EMEA&quot;
+        string salary &quot;USD range string&quot;
+        string description &quot;markdown text&quot;
+        string[] tags &quot;skill tags&quot;
+        boolean featured &quot;promoted flag&quot;
+        datetime createdAt &quot;default now&quot;
+    }
+
+    SavedJob {
+        string id PK &quot;cuid/uuid&quot;
+        string userId FK &quot;references User(id)&quot;
+        string jobId FK &quot;references Job(id)&quot;
+        datetime savedAt &quot;default now&quot;
+    }
+
+    JobApplication {
+        string id PK &quot;cuid/uuid&quot;
+        string userId FK &quot;references User(id)&quot;
+        string jobId FK &quot;references Job(id)&quot;
+        string stage &quot;applied | screening | interview | offer | rejected&quot;
+        int matchScore &quot;calculated ATS score&quot;
+        string resumeVersion &quot;resume identifier&quot;
+        string salaryRange &quot;requested salary&quot;
+        string notes &quot;cover message&quot;
+        datetime appliedAt &quot;default now&quot;
+    }
+
+    Resume {
+        string id PK &quot;cuid/uuid&quot;
+        string userId FK &quot;references User(id)&quot;
+        string title &quot;resume profile title&quot;
+        string templateId &quot;ats-compact | ivy-classic...&quot;
+        string accentColor &quot;hex color code&quot;
+        string density &quot;compact | normal | spacious&quot;
+        json content &quot;structured resume JSON&quot;
+        int atsScore &quot;0-100 score&quot;
+        datetime updatedAt &quot;auto-updated&quot;
+    }
+
+    AISession {
+        string id PK &quot;cuid/uuid&quot;
+        string userId FK &quot;references User(id)&quot;
+        string targetJob &quot;target role title&quot;
+        string company &quot;target company&quot;
+        int initialAtsScore &quot;initial baseline&quot;
+        int tailoredAtsScore &quot;post-optimization score&quot;
+        int improvement &quot;delta score&quot;
+        int bulletPointsGenerated &quot;count&quot;
+        string[] keywordsAdded &quot;injected keywords&quot;
+        datetime createdAt &quot;default now&quot;
+    }
+
+    ActivityLog {
+        string id PK &quot;cuid/uuid&quot;
+        string userId &quot;actor id&quot;
+        string userName &quot;actor name&quot;
+        string userEmail &quot;actor email&quot;
+        string type &quot;login | search | ai_tailor | apply&quot;
+        string category &quot;auth | jobs | resume | admin&quot;
+        string action &quot;action description&quot;
+        string details &quot;extended context&quot;
+        string severity &quot;info | warning | critical&quot;
+        datetime timestamp &quot;default now&quot;
+    }
+
+    AuditLog {
+        string id PK &quot;cuid/uuid&quot;
+        string adminEmail &quot;actor admin email&quot;
+        string action &quot;administrative action&quot;
+        string target &quot;target entity/user&quot;
+        string details &quot;audit metadata&quot;
+        datetime timestamp &quot;default now&quot;
+    }</pre></div>
+<hr>
+<h3>6.2 Data Schema Specifications &amp; Relational Constraints</h3>
+<h4>Model: <code>User</code></h4>
+<ul>
+<li><strong>Primary Key</strong>: <code>id</code> (<code>String</code>, default <code>cuid()</code>)</li>
+<li><strong>Unique Constraint</strong>: <code>email</code> (<code>String</code>, normalized lowercase, indexed)</li>
+<li><strong>Attributes</strong>: <code>passwordHash</code>, <code>name</code>, <code>role</code>, <code>status</code>, <code>plan</code>, <code>experienceLevel</code>, <code>skills</code>, <code>resumeScore</code>, <code>createdAt</code>, <code>updatedAt</code>.</li>
+<li><strong>Relations</strong>: 1-to-Many with <code>SavedJob</code>, <code>JobApplication</code>, <code>Resume</code>, <code>AISession</code>.</li>
+</ul>
+<h4>Model: <code>Job</code></h4>
+<ul>
+<li><strong>Primary Key</strong>: <code>id</code> (<code>String</code>, default <code>cuid()</code>)</li>
+<li><strong>Indexes</strong>: Indexed on <code>category</code>, <code>jobType</code>, and <code>createdAt</code> for rapid filtering and sorting.</li>
+<li><strong>Attributes</strong>: <code>title</code>, <code>companyName</code>, <code>category</code>, <code>specialization</code>, <code>jobType</code>, <code>candidateRequiredLocation</code>, <code>salary</code>, <code>description</code>, <code>tags</code>, <code>featured</code>, <code>createdAt</code>.</li>
+<li><strong>Relations</strong>: 1-to-Many with <code>SavedJob</code> and <code>JobApplication</code>.</li>
+</ul>
+<h4>Model: <code>JobApplication</code></h4>
+<ul>
+<li><strong>Primary Key</strong>: <code>id</code> (<code>String</code>, default <code>cuid()</code>)</li>
+<li><strong>Unique Compound Index</strong>: <code>(userId, jobId)</code> prevents duplicate applications to the same position.</li>
+<li><strong>Foreign Keys</strong>: <code>userId</code> references <code>User(id)</code> with <code>onDelete: Cascade</code>; <code>jobId</code> references <code>Job(id)</code> with <code>onDelete: Cascade</code>.</li>
+<li><strong>Attributes</strong>: <code>stage</code> (<code>applied</code>, <code>screening</code>, <code>interview</code>, <code>offer</code>, <code>rejected</code>), <code>matchScore</code>, <code>resumeVersion</code>, <code>salaryRange</code>, <code>notes</code>, <code>appliedAt</code>.</li>
+</ul>
+<h4>Model: <code>Resume</code></h4>
+<ul>
+<li><strong>Primary Key</strong>: <code>id</code> (<code>String</code>, default <code>cuid()</code>)</li>
+<li><strong>Foreign Key</strong>: <code>userId</code> references <code>User(id)</code> with <code>onDelete: Cascade</code>.</li>
+<li><strong>Attributes</strong>: <code>title</code>, <code>templateId</code>, <code>accentColor</code>, <code>density</code>, <code>content</code> (JSON containing contact details, work experiences, education, and technical competencies), <code>atsScore</code>, <code>updatedAt</code>.</li>
+</ul>
+<hr>
+<h2>7. API Design &amp; REST Endpoints Specification</h2>
+<p>The CodeSlot backend provides <strong>30 production-ready RESTful endpoints</strong> registered with OpenAPI 3.0 at <code>/api/docs</code>. Every endpoint returns a standardized response envelope:</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: { ... },
+  &quot;message&quot;: &quot;Operation completed successfully&quot;
+}
+</code></pre>
+<h3>7.1 Authentication &amp; Profile (<code>/api/auth</code>)</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Method</th>
+<th align="left">Endpoint</th>
+<th align="left">Access Level</th>
+<th align="left">Description</th>
+<th align="left">Request Payload</th>
+<th align="left">Response Data</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/auth/register</code></td>
+<td align="left">Public</td>
+<td align="left">Register new candidate account</td>
+<td align="left"><code>{ email, password, name, experienceLevel, skills }</code></td>
+<td align="left"><code>{ user, token }</code></td>
+</tr>
+<tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/auth/login</code></td>
+<td align="left">Public</td>
+<td align="left">Authenticate user credentials</td>
+<td align="left"><code>{ email, password }</code></td>
+<td align="left"><code>{ user, token }</code></td>
+</tr>
+<tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/auth/demo-login</code></td>
+<td align="left">Public</td>
+<td align="left">1-click persona switch (<code>candidate</code>, <code>recruiter</code>, <code>admin</code>)</td>
+<td align="left"><code>{ persona }</code></td>
+<td align="left"><code>{ user, token }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/auth/me</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Retrieve currently active user session</td>
+<td align="left">None</td>
+<td align="left"><code>{ user }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/auth/profile</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Fetch full profile with saved jobs &amp; applications</td>
+<td align="left">None</td>
+<td align="left"><code>{ user, profile, stats }</code></td>
+</tr>
+<tr>
+<td align="left"><code>PATCH</code></td>
+<td align="left"><code>/api/auth/profile</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Update candidate headline, skills, and links</td>
+<td align="left"><code>{ headline, skills, location, githubUrl }</code></td>
+<td align="left"><code>{ updatedProfile }</code></td>
+</tr>
+<tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/auth/logout</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Terminate session and invalidate client token</td>
+<td align="left">None</td>
+<td align="left"><code>{ success: true }</code></td>
+</tr>
+</tbody></table>
+<h3>7.2 Remote Jobs Portal (<code>/api/jobs</code>)</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Method</th>
+<th align="left">Endpoint</th>
+<th align="left">Access Level</th>
+<th align="left">Description</th>
+<th align="left">Request Payload / Query</th>
+<th align="left">Response Data</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/jobs</code></td>
+<td align="left">Public</td>
+<td align="left">Search, filter, and paginate remote jobs</td>
+<td align="left"><code>?category=&amp;experienceLevel=&amp;search=&amp;page=</code></td>
+<td align="left"><code>{ jobs: [], total, page }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/jobs/:id</code></td>
+<td align="left">Public</td>
+<td align="left">Fetch comprehensive job details &amp; requirements</td>
+<td align="left">Path parameter <code>:id</code></td>
+<td align="left"><code>{ job: { ... } }</code></td>
+</tr>
+<tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/jobs</code></td>
+<td align="left">Recruiter / Admin</td>
+<td align="left">Publish new verified remote job listing</td>
+<td align="left"><code>{ title, companyName, category, salary, ... }</code></td>
+<td align="left"><code>{ newJob }</code></td>
+</tr>
+<tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/jobs/:id/save</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Toggle bookmark status for a target job</td>
+<td align="left">Path parameter <code>:id</code></td>
+<td align="left"><code>{ saved: boolean }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/jobs/saved</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Retrieve all bookmarked jobs for active user</td>
+<td align="left">None</td>
+<td align="left"><code>{ savedJobs: [] }</code></td>
+</tr>
+<tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/jobs/:id/apply</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Submit application with tailored resume version</td>
+<td align="left"><code>{ matchScore, resumeVersion, salary, notes }</code></td>
+<td align="left"><code>{ application }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/jobs/applications</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Retrieve all applications submitted by candidate</td>
+<td align="left">None</td>
+<td align="left"><code>{ applications: [] }</code></td>
+</tr>
+</tbody></table>
+<h3>7.3 AI Resume Studio (<code>/api/resume</code>)</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Method</th>
+<th align="left">Endpoint</th>
+<th align="left">Access Level</th>
+<th align="left">Description</th>
+<th align="left">Request Payload</th>
+<th align="left">Response Data</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/resume/save</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Save customized resume profile to cloud database</td>
+<td align="left"><code>{ title, templateId, content, atsScore }</code></td>
+<td align="left"><code>{ resume }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/resume/mine</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Fetch all saved resumes for authenticated candidate</td>
+<td align="left">None</td>
+<td align="left"><code>{ resumes: [] }</code></td>
+</tr>
+<tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/resume/tailor</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Server-side Gemini AI full resume tailoring</td>
+<td align="left"><code>{ resumeData, targetJobDescription }</code></td>
+<td align="left"><code>{ tailoredResume, atsScore, keywordsAdded }</code></td>
+</tr>
+<tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/resume/bullet-enhance</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Enhance bullet point using Google X-Y-Z formula</td>
+<td align="left"><code>{ bulletText, roleContext }</code></td>
+<td align="left"><code>{ enhancedBullets: [] }</code></td>
+</tr>
+</tbody></table>
+<h3>7.4 Admin OS &amp; Recruitment Telemetry (<code>/api/admin</code>)</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Method</th>
+<th align="left">Endpoint</th>
+<th align="left">Access Level</th>
+<th align="left">Description</th>
+<th align="left">Request Payload</th>
+<th align="left">Response Data</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/admin/stats</code></td>
+<td align="left">Admin Only</td>
+<td align="left">Platform KPI aggregations (users, jobs, apps)</td>
+<td align="left">None</td>
+<td align="left"><code>{ stats: { users, jobs, apps, atsUplift } }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/admin/users</code></td>
+<td align="left">Admin Only</td>
+<td align="left">List all platform candidate &amp; recruiter accounts</td>
+<td align="left"><code>?search=&amp;status=&amp;page=</code></td>
+<td align="left"><code>{ users: [], total }</code></td>
+</tr>
+<tr>
+<td align="left"><code>PATCH</code></td>
+<td align="left"><code>/api/admin/users/:id/status</code></td>
+<td align="left">Admin Only</td>
+<td align="left">Update account status (<code>active</code>, <code>verified</code>, etc.)</td>
+<td align="left"><code>{ status: &quot;verified&quot; }</code></td>
+<td align="left"><code>{ updatedUser }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/admin/applications</code></td>
+<td align="left">Admin Only</td>
+<td align="left">Fetch candidate pipeline for Kanban tracking</td>
+<td align="left"><code>?stage=&amp;search=</code></td>
+<td align="left"><code>{ applications: [] }</code></td>
+</tr>
+<tr>
+<td align="left"><code>PATCH</code></td>
+<td align="left"><code>/api/admin/applications/:id/stage</code></td>
+<td align="left">Admin Only</td>
+<td align="left">Advance candidate stage (<code>interview</code>, <code>offer</code>, etc.)</td>
+<td align="left"><code>{ stage: &quot;interview&quot; }</code></td>
+<td align="left"><code>{ updatedApplication }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/admin/activities</code></td>
+<td align="left">Admin Only</td>
+<td align="left">Stream live candidate and platform activity events</td>
+<td align="left"><code>?limit=50</code></td>
+<td align="left"><code>{ activities: [] }</code></td>
+</tr>
+<tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/admin/activities</code></td>
+<td align="left">Bearer Token</td>
+<td align="left">Ingest client telemetry event into activity stream</td>
+<td align="left"><code>{ action, category, details }</code></td>
+<td align="left"><code>{ activityLog }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/admin/ai-sessions</code></td>
+<td align="left">Admin Only</td>
+<td align="left">Retrieve historical Gemini AI tailoring telemetry</td>
+<td align="left"><code>?limit=50</code></td>
+<td align="left"><code>{ aiSessions: [] }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/admin/audit-logs</code></td>
+<td align="left">Admin Only</td>
+<td align="left">Fetch immutable administrative audit trail</td>
+<td align="left"><code>?limit=100</code></td>
+<td align="left"><code>{ auditLogs: [] }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/admin/broadcast</code></td>
+<td align="left">Public</td>
+<td align="left">Retrieve active global announcements</td>
+<td align="left">None</td>
+<td align="left"><code>{ announcement: { ... } }</code></td>
+</tr>
+<tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/admin/broadcast</code></td>
+<td align="left">Admin Only</td>
+<td align="left">Publish new global banner across candidate portal</td>
+<td align="left"><code>{ message, active, severity }</code></td>
+<td align="left"><code>{ announcement }</code></td>
+</tr>
+<tr>
+<td align="left"><code>POST</code></td>
+<td align="left"><code>/api/admin/system/clear-cache</code></td>
+<td align="left">Admin Only</td>
+<td align="left">Flush and synchronize admin telemetry cache</td>
+<td align="left">None</td>
+<td align="left"><code>{ flushed: true, timestamp }</code></td>
+</tr>
+</tbody></table>
+<h3>7.5 System Health (<code>/api/health</code>)</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Method</th>
+<th align="left">Endpoint</th>
+<th align="left">Access Level</th>
+<th align="left">Description</th>
+<th align="left">Response Data</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/health</code></td>
+<td align="left">Public</td>
+<td align="left">Root liveness healthcheck</td>
+<td align="left"><code>{ status: &quot;ok&quot;, uptime: 1240, service: &quot;codeslot-api&quot; }</code></td>
+</tr>
+<tr>
+<td align="left"><code>GET</code></td>
+<td align="left"><code>/api/health</code></td>
+<td align="left">Public</td>
+<td align="left">Deep healthcheck (DB connection &amp; memory)</td>
+<td align="left"><code>{ status: &quot;healthy&quot;, database: &quot;connected&quot;, memoryUsage: { ... } }</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>8. Generative AI Integration &amp; Algorithmic Heuristic Fallback</h2>
+<p>CodeSlot employs a <strong>dual-engine architecture</strong> to ensure maximum intelligence while providing high availability and zero downtime:</p>
+<pre><code>                  ┌─────────────────────────────────────────┐
+                  │ Candidate Authentic Resume + Target Job │
+                  └────────────────────┬────────────────────┘
+                                       │
+                         [Is Gemini API Key Available?]
+                                       │
+                       ┌───────────────┴───────────────┐
+                     YES                              NO / Error
+                       ▼                               ▼
+       ┌───────────────────────────────┐ ┌───────────────────────────────┐
+       │   Primary Generative Engine   │ │  Deterministic Heuristic      │
+       │    (Google Gemini 2.5 Flash)  │ │      Fallback Engine          │
+       ├───────────────────────────────┤ ├───────────────────────────────┤
+       │ • Context Analysis            │ │ • Regex Keyword Extraction    │
+       │ • Semantic Gap Detection      │ │ • TF-IDF Term Weighting       │
+       │ • Google X-Y-Z Bullet Rewrite │ │ • Skill Matrix Re-ordering    │
+       │ • Structured JSON Output      │ │ • Algorithmic ATS Match Calc  │
+       └───────────────┬───────────────┘ └───────────────┬───────────────┘
+                       │                               │
+                       └───────────────┬───────────────┘
+                                       ▼
+                  ┌─────────────────────────────────────────┐
+                  │ Tailored ATS Resume (90%+ Match Score)  │
+                  └─────────────────────────────────────────┘
+</code></pre>
+<h3>8.1 Primary Engine: Google Gemini 2.5 Flash</h3>
+<ul>
+<li><strong>API Model</strong>: Google Generative AI (<code>gemini-2.5-flash</code> with fallback to <code>gemini-2.0-flash</code>).</li>
+<li><strong>Prompt Engineering Strategy</strong>:<ul>
+<li><strong>Zero-Hallucination Guardrails</strong>: The prompt strictly instructs the LLM: <em>&quot;Do NOT fabricate fictitious employers, altered dates of employment, or unauthorized academic degrees. You are strictly authorized to rewrite existing accomplishments and re-prioritize existing technical skills.&quot;</em></li>
+<li><strong>Accomplishment Transformation</strong>: Converts vague descriptive phrases into high-impact accomplishments using the <strong>Google X-Y-Z formula</strong>.</li>
+<li><strong>Schema Enforcement</strong>: Employs Gemini&#39;s native JSON mode to ensure the output strictly mirrors the TypeScript <code>ResumeData</code> interface defined in <code>@code-slot/shared</code>.</li>
+</ul>
+</li>
+</ul>
+<h3>8.2 The Google X-Y-Z Accomplishment Optimization Model</h3>
+<p>The system refactors candidate bullet points following the model popularized by Google engineering hiring managers:</p>
+<p>$$\text{Accomplished } [\mathbf{X}] \text{, as measured by } [\mathbf{Y}] \text{, by doing } [\mathbf{Z}]$$</p>
+<ul>
+<li><strong>Before (Weak/Generic)</strong>:<div class="custom-quote">
+<p><em>&quot;Worked on backend APIs and optimized database queries.&quot;</em></p>
+</div>
+</li>
+<li><strong>After (CodeSlot Gemini Optimization)</strong>:<div class="custom-quote">
+<p><em>&quot;Accomplished a <strong>42% reduction in p99 API latency</strong>, as measured by <strong>Datadog APM metrics</strong>, by <strong>implementing Redis caching layers and optimizing Prisma PostgreSQL compound indexes</strong>.&quot;</em></p>
+</div>
+</li>
+</ul>
+<h3>8.3 Secondary Engine: Deterministic Heuristic Fallback</h3>
+<p>If the user has not configured a Gemini API key, or if network connectivity is interrupted, CodeSlot triggers its deterministic heuristic fallback engine:</p>
+<ol>
+<li><strong>Keyword Extraction</strong>: Uses regex tokenization against a curated dictionary of 350+ engineering technologies (e.g., Docker, Kubernetes, React, Node.js, GraphQL, AWS).</li>
+<li><strong>Skill Matrix Alignment</strong>: Cross-references the candidate&#39;s existing skill array against the target job requirements, bubbling exact matches to the top of the resume skill list.</li>
+<li><strong>ATS Match Calculation</strong>: Calculates the Jaccard similarity coefficient between the job&#39;s required skills and the candidate&#39;s verified skills:<br>$$S_{\text{ATS}} = \frac{|K_{\text{Job}} \cap K_{\text{Candidate}}|}{|K_{\text{Job}}|} \times 100$$</li>
+<li><strong>Zero Failure Mode</strong>: Ensures that user demonstrations and recruitment reviews remain functional under all network conditions.</li>
+</ol>
+<hr>
+<h2>9. Security, RBAC &amp; Telemetry Auditing</h2>
+<h3>9.1 Authentication &amp; Authorization Pipeline</h3>
+<ul>
+<li><strong>Cryptographic Password Hashing</strong>: Passwords are never stored in plaintext. They are salted and hashed using Node.js&#39;s native <code>crypto.scryptSync</code> / HMAC algorithms with 64-byte salt lengths.</li>
+<li><strong>Stateless JWT Tokens</strong>: Upon successful login, the server issues a JSON Web Token signed with SHA-256 HMAC containing the user&#39;s <code>id</code>, <code>email</code>, and <code>role</code>. Tokens have a 7-day expiration.</li>
+<li><strong>Role-Based Access Control (RBAC)</strong>: The <code>auth.middleware.ts</code> inspects incoming HTTP request headers for <code>Authorization: Bearer &lt;token&gt;</code>. Sensitive administrative endpoints enforce role constraints:<pre><code class="language-typescript">export const requireRole = (roles: string[]) =&gt; {
+  return (req: Request, res: Response, next: NextFunction) =&gt; {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ error: &quot;Access forbidden: insufficient role permissions&quot; });
+    }
+    next();
+  };
+};
+</code></pre>
+</li>
+</ul>
+<h3>9.2 Input Sanitization &amp; Boundary Validation</h3>
+<ul>
+<li><strong>Zod Middleware Guards</strong>: Every incoming HTTP request body and query string is intercepted by <code>validate.middleware.ts</code>. Data that fails schema validation is rejected with <code>400 Bad Request</code> prior to reaching controller or database layers.</li>
+<li><strong>HTTP Security Headers</strong>: Express is hardened using <strong>Helmet</strong>, which sets <code>Content-Security-Policy</code>, <code>X-Content-Type-Options: nosniff</code>, <code>X-Frame-Options: DENY</code>, and removes <code>X-Powered-By</code>.</li>
+<li><strong>CORS Configuration</strong>: Express CORS middleware restricts cross-origin resource sharing strictly to configured frontend domains (e.g., <code>http://localhost:3000</code>).</li>
+</ul>
+<h3>9.3 Immutable Audit Logging</h3>
+<ul>
+<li>Every administrative state transition (e.g., advancing an applicant&#39;s stage in the Kanban board, toggling user verification, publishing broadcast announcements) automatically creates an immutable record in the <code>AuditLog</code> table.</li>
+<li>Log entries capture: <code>adminEmail</code>, <code>action</code>, <code>target</code>, <code>details</code>, and <code>timestamp</code>.</li>
+</ul>
+<hr>
+<h2>10. Quality Assurance, Testing &amp; Verification</h2>
+<h3>10.1 Automated End-to-End Test Suite Verification</h3>
+<p>The system includes an automated integration test runner (<code>test-all-endpoints.mjs</code>) that exercises all 30 RESTful endpoints against a live PostgreSQL instance.</p>
+<pre><code class="language-bash"># Execute End-to-End Verification Suite
+node test-all-endpoints.mjs
+</code></pre>
+<h4>Test Suite Verification Matrix:</h4>
+<ul>
+<li>✅ <strong>System Health</strong>: Verified <code>/health</code> and <code>/api/health</code>.</li>
+<li>✅ <strong>Authentication</strong>: Verified candidate registration, login, demo persona switching, <code>/api/auth/me</code>, and <code>/api/auth/profile</code>.</li>
+<li>✅ <strong>Jobs Discovery</strong>: Verified job search, category filtering, seniority filtering, job detail lookup, bookmarking, and application submission.</li>
+<li>✅ <strong>AI Resume Studio</strong>: Verified cloud resume saving, retrieval, and AI bullet point enhancement.</li>
+<li>✅ <strong>Admin OS &amp; Kanban</strong>: Verified platform stats aggregation, user directory inspection, user status modification, application pipeline retrieval, Kanban stage progression, live activity stream ingestion, and broadcast announcement publishing.</li>
+</ul>
+<p><strong>Verification Result</strong>: <strong>30 / 30 Endpoints Passed with 100% Success Rate.</strong></p>
+<h3>10.2 Type Safety &amp; Linting Verification</h3>
+<pre><code class="language-bash"># TypeScript compiler check across all monorepo workspaces
+pnpm typecheck
+
+# ESLint static code analysis
+pnpm lint
+</code></pre>
+<hr>
+<h2>11. Installation, Environment Setup &amp; Deployment</h2>
+<h3>11.1 System Prerequisites</h3>
+<ul>
+<li><strong>Node.js</strong>: <code>v20.0.0</code> or higher</li>
+<li><strong>pnpm</strong>: <code>v10.0.0</code> or higher (<code>npm install -g pnpm</code>)</li>
+<li><strong>PostgreSQL</strong>: <code>v16.0</code> or higher (or Docker)</li>
+</ul>
+<h3>11.2 Step-by-Step Local Deployment</h3>
+<ol>
+<li><p><strong>Clone the Repository</strong>:</p>
+<pre><code class="language-bash">git clone https://github.com/abdellahseid/codeslot_2.git
+cd code_slot
+</code></pre>
+</li>
+<li><p><strong>Install Dependencies</strong>:</p>
+<pre><code class="language-bash">pnpm install
+</code></pre>
+</li>
+<li><p><strong>Configure Environment Variables</strong>:</p>
+<pre><code class="language-bash">cp .env.example .env
+</code></pre>
+<p><em>Required parameters in <code>.env</code>:</em></p>
+<pre><code class="language-env"># Frontend Configuration
+FRONTEND_PORT=3000
+VITE_API_URL=http://localhost:5000/api
+
+# Backend &amp; Database Configuration
+BACKEND_PORT=5000
+DATABASE_URL=&quot;postgresql://postgres:postgres@localhost:5432/codeslot?schema=public&quot;
+JWT_SECRET=&quot;codeslot_development_secret_key_2026&quot;
+CORS_ORIGIN=&quot;http://localhost:3000&quot;
+
+# Generative AI (Optional - Heuristic fallback engages if omitted)
+GEMINI_API_KEY=&quot;your_api_key_here&quot;
+VITE_GEMINI_API_KEY=&quot;your_api_key_here&quot;
+</code></pre>
+</li>
+<li><p><strong>Initialize Database &amp; Migrations</strong>:</p>
+<pre><code class="language-bash"># Generate Prisma client typings
+pnpm db:generate
+
+# Apply database migrations
+pnpm db:migrate
+</code></pre>
+</li>
+<li><p><strong>Launch Application Concurrently</strong>:</p>
+<pre><code class="language-bash">pnpm dev
+</code></pre>
+<ul>
+<li><strong>Frontend Application</strong>: <a href="http://localhost:3000">http://localhost:3000</a></li>
+<li><strong>Backend REST API</strong>: <a href="http://localhost:5000/api">http://localhost:5000/api</a></li>
+<li><strong>Interactive OpenAPI / Swagger Docs</strong>: <a href="http://localhost:5000/api/docs">http://localhost:5000/api/docs</a></li>
+<li><strong>Health Telemetry</strong>: <a href="http://localhost:5000/api/health">http://localhost:5000/api/health</a></li>
+</ul>
+</li>
+</ol>
+<h3>11.3 Containerized Execution (Docker Compose)</h3>
+<p>To run the complete production stack (PostgreSQL 16, Express API, and Vite SPA) in isolated containers:</p>
+<pre><code class="language-bash"># Build and launch all containers in detached mode
+pnpm docker:up
+
+# Inspect live container logs
+pnpm docker:logs
+
+# Stop containers
+pnpm docker:down
+</code></pre>
+<hr>
+<p><em>Official System Documentation &amp; Requirements Specification for CodeSlot — INSA Final Capstone Project 2026.</em><br><em>Candidate / Author: Hanifa Seid (CTC-1646-26).</em></p>
+
+  </div>
+
+</body>
+</html>
