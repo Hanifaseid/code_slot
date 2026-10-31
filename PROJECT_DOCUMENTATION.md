@@ -12,6 +12,7 @@
 | **Candidate ID / CTC** | **CTC-1646-26** |
 | **Project Repository** | `codeslot-monorepo` (Full-Stack Monorepo) |
 | **Academic Year** | **2026** |
+| **Project Presentation** | [▶️ Watch Video Walkthrough on Loom](https://www.loom.com/share/814e303337b94c9fa9382ad39184c092) |
 | **Project Status** | **Production-Ready & Fully Verified** |
 
 ---
