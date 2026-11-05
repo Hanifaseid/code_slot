@@ -30,7 +30,7 @@
 | **CTC Number** | **CTC-1646-26** |
 | **GitHub Repository** | [github.com/Hanifaseid/code_slot](https://github.com/Hanifaseid/code_slot) |
 | **Project Presentation** | [▶️ Watch Video Walkthrough on Loom](https://www.loom.com/share/814e303337b94c9fa9382ad39184c092) |
-| **Project Status** | Completed & Fully Verified |
+| **Project Status** | Completed |
 
 ---
 
