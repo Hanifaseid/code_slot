@@ -15,6 +15,7 @@
 [![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-8E75FF?logo=google-gemini&logoColor=white)](https://ai.google.dev/)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![pnpm](https://img.shields.io/badge/pnpm-10.33-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&logoColor=white)](https://github.com/Hanifaseid/code_slot)
 [![Presentation](https://img.shields.io/badge/Video_Presentation-Loom-625DF5?logo=loom&logoColor=white)](https://www.loom.com/share/814e303337b94c9fa9382ad39184c092)
 
 <br />
@@ -27,6 +28,7 @@
 | **Project Type** | **INSA Final Project** (Information Network Security Agency) |
 | **Student / Author** | **Hanifa Seid** |
 | **CTC Number** | **CTC-1646-26** |
+| **GitHub Repository** | [github.com/Hanifaseid/code_slot](https://github.com/Hanifaseid/code_slot) |
 | **Project Presentation** | [▶️ Watch Video Walkthrough on Loom](https://www.loom.com/share/814e303337b94c9fa9382ad39184c092) |
 | **Project Status** | Completed & Fully Verified |
 
@@ -214,7 +216,7 @@ codeslot/
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/abdellahseid/codeslot_2.git
+   git clone https://github.com/Hanifaseid/code_slot.git
    cd code_slot
    ```
 
@@ -364,6 +366,7 @@ This project is submitted in fulfillment of the **INSA Final Project**:
 - **Student Name**: **Hanifa Seid**
 - **CTC Number**: **CTC-1646-26**
 - **Institution**: **INSA** (Information Network Security Agency)
+- **GitHub Repository**: [https://github.com/Hanifaseid/code_slot](https://github.com/Hanifaseid/code_slot)
 - **Project Presentation**: [▶️ Watch Loom Video Presentation](https://www.loom.com/share/814e303337b94c9fa9382ad39184c092)
 - **Year**: 2026
 
